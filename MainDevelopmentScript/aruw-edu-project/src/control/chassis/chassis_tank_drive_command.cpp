@@ -29,9 +29,31 @@ using tap::algorithms::limitVal;
 
 namespace control::chassis
 {
-// STEP 1 (Tank Drive): Constructor
+// Constructor
+ChassisTankDriveCommand::ChassisTankDriveCommand(
+    ChassisSubsystem &chassis,
+    ControlOperatorInterface &operatorInterface)
+    : chassis(chassis),
+      operatorInterface(operatorInterface)
+{
+    addSubsystemRequirement(&chassis);
+}
 
-// STEP 2 (Tank Drive): execute function
+// Execute function
+void ChassisTankDriveCommand::execute()
+{
+    auto scale = [](float raw) -> float {
+        return limitVal(raw, -1.0f, 1.0f) * MAX_CHASSIS_SPEED_MPS;
+    };
+
+    chassis.setVelocity(
+        scale(operatorInterface.getChassisLeftVerticalInput()),
+        scale(operatorInterface.getChassisRightVerticalInput()),
+        scale(operatorInterface."function"),
+        scale(operatorInterface."function")
+        );
+}
 
 // STEP 3 (Tank Drive): end function
+void ChassisTankDriveCommand::end(bool) { chassis.setVelocity(0, 0, 0, 0); }
 };  // namespace control::chassis

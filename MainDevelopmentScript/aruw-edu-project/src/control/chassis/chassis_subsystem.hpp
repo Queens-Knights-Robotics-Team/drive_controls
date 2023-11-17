@@ -84,11 +84,16 @@ public:
     /// @brief Control the chassis using tank drive. Sets the wheel velocity of the four drive
     /// motors based on the input left/right desired velocity.
     ///
-    /// @param left Desired chassis speed in m/s of the left side of the chassis. Positive speed is
-    /// forward, negative is backwards.
-    /// @param right Desired chassis speed in m/s of the right side of the chassis.
+    /// @param leftVert 
     ///
-    mockable void setVelocityTankDrive(float left, float right);
+    /// @param rightVert 
+    ///
+    /// @param leftHorz 
+    ///
+    /// @param rightHorz 
+    ///
+
+    mockable void setVelocity(float leftVert, float rightVert, float leftHorz, float rightHorz);
 
     ///
     /// @brief Runs velocity PID controllers for the drive motors.

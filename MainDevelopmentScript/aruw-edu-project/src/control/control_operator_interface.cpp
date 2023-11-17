@@ -29,6 +29,20 @@ namespace control
 {
 ControlOperatorInterface::ControlOperatorInterface(Remote &remote) : remote(remote) {}
 
-// STEP 2 (Tank Drive): Add getChassisTankLeftInput and getChassisTankRightInput function
-// definitions
+// STEP 2 (Tank Drive): Add ggetChassisLeftVerticalInput, getChassisLeftHorizontalInput, getChassisRightVerticalInput, and getChassisRightHorizontalInput functions
+float ControlOperatorInterface::getChassisLeftVerticalInput()
+{
+    return limitVal(remote.getChannel(Remote::Channel::LEFT_VERTICAL), -1.0f, 1.0f);
+}
+
+float ControlOperatorInterface::getChassisRightVerticalInput()
+{
+    return limitVal(remote.getChannel(Remote::Channel::RIGHT_VERTICAL), -1.0f, 1.0f);
+}
+
+// ...
+
+// ...
+
+
 }  // namespace control

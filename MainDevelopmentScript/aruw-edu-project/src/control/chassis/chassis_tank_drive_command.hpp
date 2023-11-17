@@ -47,7 +47,7 @@ public:
      */
     ChassisTankDriveCommand(ChassisSubsystem &chassis, ControlOperatorInterface &operatorInterface);
 
-    const char *getName() const override { return "Chassis tank drive"; }
+    const char *getName() const override { return "Chassis main drive"; }
 
     void initialize() override {}
 

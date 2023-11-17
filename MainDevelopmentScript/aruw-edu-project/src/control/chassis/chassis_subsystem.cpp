@@ -27,11 +27,68 @@ using tap::algorithms::limitVal;
 
 namespace control::chassis
 {
-// STEP 1 (Tank Drive): create constructor
+// Create constructor
+ChassisSubsystem::ChassisSubsystem(Drivers &drivers, const ChassisConfig &config)
+    : tap::control::Subsystem(&drivers),
+      desiredOutput{},
+      pidControllers{},
+      motors{
+          Motor(&drivers, config.leftFrontId, config.canBus, false, "LF"),
+          Motor(&drivers, config.leftBackId, config.canBus, false, "LB"),
+          Motor(&drivers, config.rightBackId, config.canBus, true, "RB"),
+          Motor(&drivers, config.rightFrontId, config.canBus, true, "RF"),
+      }
+{
+    for (auto &controller : pidControllers)
+    {
+        controller.setParameter(config.wheelVelocityPidConfig);
+    }
+}
 
-// STEP 2 (Tank Drive): initialize function
+// Initialize function
+void ChassisSubsystem::initialize()
+{
+    for (auto &motor : motors)
+    {
+        motor.initialize();
+    }
+}
 
-// STEP 3 (Tank Drive): setVelocityTankDrive function
+// setVelocity function
+void ChassisSubsystem::setVelocity(float leftVert, float rightVert, float leftHorz, float rightHorz)
+{
+    leftVert = mpsToRpm(leftVert);
+    rightVert = mpsToRpm(rightVert);
+    leftHorz = mpsToRpm(leftHorz);
+    rightHorz = mpsToRpm(rightHorz);
 
-// STEP 4 (Tank Drive): refresh function
+
+    leftVert = limitVal(leftVert, -MAX_WHEELSPEED_RPM, MAX_WHEELSPEED_RPM);
+    rightVert = limitVal(rightVert, -MAX_WHEELSPEED_RPM, MAX_WHEELSPEED_RPM);
+    leftHorz = limitVal(leftHorz, -MAX_WHEELSPEED_RPM, MAX_WHEELSPEED_RPM);
+    rightHorz = limitVal(rightHorz, -MAX_WHEELSPEED_RPM, MAX_WHEELSPEED_RPM);
+
+    // Implment Mecanum Wheel Logical Code Here
+
+
+
+    desiredOutput[static_cast<uint8_t>(MotorId::LF)] = "...";
+    desiredOutput[static_cast<uint8_t>(MotorId::LB)] = "...";
+    desiredOutput[static_cast<uint8_t>(MotorId::RB)] = "...";
+    desiredOutput[static_cast<uint8_t>(MotorId::RF)] = "...";
+}
+
+// STEP 5 Refresh function
+void ChassisSubsystem::refresh()
+{
+    auto runPid = [](Pid &pid, Motor &motor, float desiredOutput) {
+        pid.update(desiredOutput - motor.getShaftRPM());
+        motor.setDesiredOutput(pid.getValue());
+    };
+
+    for (size_t ii = 0; ii < motors.size(); ii++)
+    {
+        runPid(pidControllers[ii], motors[ii], desiredOutput[ii]);
+    }
+}
 }  // namespace control::chassis
