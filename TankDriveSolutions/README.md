@@ -1,4 +1,5 @@
-[![pipeline status](https://gitlab.com/aruw/controls/aruw-edu/badges/develop/pipeline.svg)](https://gitlab.com/aruw/controls/aruw-edu/-/commits/develop)
+# Welcome to the Solutions!
+
 
 Please refer to the [old aruw-edu](https://gitlab.com/aruw/controls/aruw-edu-depreciated) until this
 repository has been completed. It is currently in development.
