@@ -1,0 +1,42 @@
+{
+    "configurations": [
+        {
+            "name": "Test",
+            "defines": ["${default}", "ENV_UNIT_TESTS", "PLATFORM_HOSTED", "RUN_WITH_PROFILING"],
+            "includePath": [
+                "${default}",
+                "aruw-edu-project/taproot/sim-modm/hosted-linux/modm/src",
+                "aruw-edu-project/taproot/test",
+                "aruw-edu-project/test"
+            ],
+            "compilerPath": "g++",
+            "intelliSenseMode": "gcc-x64",
+            "browse": { "limitSymbolsToIncludedHeaders": true }
+        },
+        {
+            "name": "Sim",
+            "defines": ["${default}", "PLATFORM_HOSTED", "RUN_WITH_PROFILING"],
+            "includePath": [
+                "${default}",
+                "aruw-edu-project/taproot/sim-modm/hosted-linux/modm/src"
+            ],
+            "compilerPath": "g++",
+            "intelliSenseMode": "gcc-x64",
+            "browse": { "limitSymbolsToIncludedHeaders": true }
+        },
+        {
+            "name": "Hardware",
+            "includePath": [
+                "${default}",
+                "aruw-edu-project/taproot/modm/src",
+                "aruw-edu-project/taproot/modm/ext/cmsis/core",
+                "aruw-edu-project/taproot/modm/ext/cmsis/device",
+                "aruw-edu-project/taproot/modm/ext/cmsis/dsp"        
+            ],
+            "compilerPath": "arm-none-eabi-g++",
+            "intelliSenseMode": "gcc-arm",
+            "browse": { "limitSymbolsToIncludedHeaders": true }
+        }
+    ],
+    "version": 4
+}
