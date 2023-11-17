@@ -1,0 +1,207 @@
+# Copyright (c) 2020-2021 Advanced Robotics at the University of Washington <robomstr@uw.edu>
+#
+# This file is part of aruw-edu.
+#
+# aruw-edu is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# aruw-edu is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with aruw-edu.  If not, see <https://www.gnu.org/licenses/>.
+
+default:
+  image: aruw/mcb-2020-gitlab-ci:2021-06-02.1
+
+variables:
+  ARTIFACT_PATH: isolated-deploy
+  GIT_SUBMODULE_STRATEGY: normal
+  DEFAULT_BUILD_ELF_FILE: build/hardware/scons-release/aruw-edu-project.elf
+  DEFAULT_TESTS_BUILD_ELF_FILE: build/tests/scons-fast/aruw-edu-project-tests.elf
+  NUM_JOBS: 4
+
+.verification_except: &verification_except
+  - schedules
+
+.default_only: &default_only
+  - merge_requests
+  - develop
+  - schedules
+
+stages:
+  - Build
+  - Test
+  - Quality
+  - Deploy Pages
+
+# Quality
+# Last stage, but configured to not depend on preceding jobs
+
+clang-format:
+  stage: Quality
+  needs: []
+  script:
+    - python3 /run-clang-format.py --clang-format-executable clang-format-10 -r aruw-edu-project/src/ aruw-edu-project/test/
+  except: *verification_except
+  only: *default_only
+
+"Policy Checks":
+  stage: Quality
+  variables:
+    GIT_SUBMODULE_STRATEGY: recursive
+  script:
+    - python3 ./taproot-scripts/check_singleton_drivers.py DoNotUse_getDrivers
+        -p ./aruw-edu-project/src/
+        -w drivers_singleton.cpp
+            drivers_singleton.hpp
+            main.cpp
+
+    - python3 ./taproot-scripts/check_license_headers.py
+        -p aruw-edu
+        -i './**/__init__.py' 'taproot/**/*' 'taproot-scripts/**/*' 'aruw-edu-project/taproot/**/*' 'aruw-edu-project/robot-type/robot_type.hpp'
+        -o 'Advanced Robotics at the University of Washington'
+
+    - ./taproot-scripts/check_taproot_submodule.sh ./aruw-edu-project ./taproot
+  except: *verification_except
+  only: *default_only
+
+# Hidden jobs to be extended for each robot
+
+.hw_build:
+  stage: Build
+  script:
+    - cd aruw-edu-project
+    - python3 $(which scons) build robot=TARGET_$ROBOT -j${NUM_JOBS} additional-ccflags=-Werror
+    - python3 $(which scons) size robot=TARGET_$ROBOT -j${NUM_JOBS} additional-ccflags=-Werror > size.txt
+    - python3 ../taproot-scripts/parse_metrics.py -i size.txt -o metrics.txt --identifier $ROBOT
+    - cp $DEFAULT_BUILD_ELF_FILE ../$ARTIFACT_PATH/aruw-edu-project-$ROBOT.elf
+  artifacts:
+    name: "$CI_JOB_NAME-$CI_COMMIT_REF_NAME-$ROBOT-mcb"
+    paths:
+      - $ARTIFACT_PATH/*
+    expire_in: 2 weeks
+    reports:
+      metrics: metrics.txt
+  only: *default_only
+
+.sim_build:
+  stage: Build
+  script:
+    - cd aruw-edu-project
+    - python3 $(which scons) build-sim profile=fast robot=TARGET_$ROBOT -j${NUM_JOBS}
+  only: *default_only
+
+.test_build:
+  stage: Build
+  script:
+    - cd aruw-edu-project
+    - python3 $(which scons) build-tests profile=fast robot=TARGET_$ROBOT -j${NUM_JOBS}
+  artifacts:
+    paths:
+      - aruw-edu-project/$DEFAULT_TESTS_BUILD_ELF_FILE
+  only:
+    variables:
+      - $RUN_TESTS
+
+.test_run:
+  stage: Test
+  script:
+    - cd aruw-edu-project
+    - valgrind --leak-check=full --error-exitcode=1 --show-leak-kinds=all $DEFAULT_TESTS_BUILD_ELF_FILE
+  only: *default_only
+
+
+# Standard
+
+"Standard: build for hardware":
+  extends:
+    - .hw_build
+  variables:
+    ROBOT: STANDARD
+
+"Standard: build for sim":
+  extends:
+    - .sim_build
+  variables:
+    ROBOT: STANDARD
+
+"Standard: build for tests":
+  extends:
+    - .test_build
+  variables:
+    ROBOT: STANDARD
+
+"Standard: run tests":
+  # The Standard's test run is also evaluated for code coverage and used as the repo-level coverage report
+  needs: [ "Standard: build for tests" ]
+  dependencies: [ "Standard: build for tests" ]
+  extends:
+    - .test_run
+  variables:
+    ROBOT: STANDARD
+  script:
+    - cd aruw-edu-project
+    - valgrind --leak-check=full --error-exitcode=1 --show-leak-kinds=all $DEFAULT_TESTS_BUILD_ELF_FILE
+    - cd .. && gcovr -g --xml > cobertura.xml
+    - 'sed -i "s=<source>.</source>=<source>./aruw-edu-project</source>=g" cobertura.xml'
+    - 'sed -i "s;filename=\";filename=\"aruw-edu-project/;g" cobertura.xml'
+  coverage: '/\s+Total:\|(\d+.\d+\%).+\|.+\|.+/'
+  artifacts:
+    name: "$CI_JOB_NAME-$CI_COMMIT_REF_NAME-standard-tests"
+    reports:
+      coverage_report:
+        coverage_format: cobertura
+        path: cobertura.xml
+    expire_in: 2 weeks
+  only:
+    variables:
+      - $RUN_TESTS
+
+"Generate Docs":
+  image: alpine
+  needs: []
+  variables:
+    GIT_SUBMODULE_STRATEGY: none
+  stage: Deploy Pages
+  before_script:
+    - apk update
+    - apk add py-pip python3-dev
+    - apk add make
+    - apk add --no-cache g++ gcc libxml2-dev libxslt-dev
+    - pip3 install -r docs/requirements.txt
+    - apk add doxygen
+  script:
+    - cd docs && make html
+    - mv _build/html/ ../public/
+  artifacts:
+    paths:
+      - public
+  only:
+    - develop
+    - merge_requests
+  except:
+    - schedules
+  environment:
+    name: "docs preview ${CI_COMMIT_REF_SLUG}"
+    url: "https://aruw.gitlab.io/-/controls/$CI_PROJECT_NAME/-/jobs/$CI_JOB_ID/artifacts/public/index.html"
+
+pages:
+  image: alpine
+  needs: ["Generate Docs"]
+  dependencies: ["Generate Docs"]
+  variables:
+    GIT_SUBMODULE_STRATEGY: none
+  stage: Deploy Pages
+  script: "true"
+  artifacts:
+    paths:
+      - public
+  only:
+    - develop
+  except:
+    - schedules

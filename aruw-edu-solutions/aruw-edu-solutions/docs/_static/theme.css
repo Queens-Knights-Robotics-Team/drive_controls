@@ -1,0 +1,8 @@
+.wy-nav-content {
+    max-width: 1400px !important;
+}
+
+/* Properties default to inline-block, allowing them to appear stacked on the same row. */
+.py.property {
+    display: block !important;
+}
