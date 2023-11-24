@@ -33,14 +33,13 @@ class ControlOperatorInterface
 public:
     ControlOperatorInterface(tap::communication::serial::Remote &remote);
 
-    // STEP 1 (Tank Drive): Add getChassisLeftVerticalInput, getChassisLeftHorizontalInput, getChassisRightVerticalInput, and getChassisRightHorizontalInput functions
+    // Add getChassisLeftVerticalInput, getChassisLeftHorizontalInput, getChassisRightVerticalInput, and getChassisRightHorizontalInput functions
     mockable float getChassisLeftVerticalInput();
 
     mockable float getChassisRightVerticalInput();
 
-    // ...
+    mockable float getChassisLeftHorizontalInput();
 
-    // ...
 
 private:
     tap::communication::serial::Remote &remote;
