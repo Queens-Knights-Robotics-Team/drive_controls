@@ -52,18 +52,26 @@ void Robot::initSubsystemCommands()
 void Robot::initializeSubsystems()
 {
     // STEP 4 (Tank Drive): initialize declared ChassisSubsystem
+    chassis.initialize();
     // STEP 4 (Agitator Control): initialize declared VelocityAgitatorSubsystem
+    agitatorSubsystem.initialize();
 }
 
 void Robot::registerSoldierSubsystems()
 {
     // STEP 5 (Tank Drive): register declared ChassisSubsystem
+    drivers.commandScheduler.registerSubsystem(&chassis);
+
+
     // STEP 5 (Agitator Control): register declared VelocityAgitatorSubsystem
 }
 
 void Robot::setDefaultSoldierCommands()
 {
     // STEP 6 (Tank Drive): set ChassisTanKDriveCommand as default command for ChassisSubsystem
+    chassis.setDefaultCommand(&chassisTankDrive);
+
+
 }
 
 void Robot::startSoldierCommands() {}
