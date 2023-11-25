@@ -89,7 +89,7 @@ static void initializeIo(Drivers *drivers)
     drivers->schedulerTerminalHandler.init();
     drivers->djiMotorTerminalSerialHandler.init();
 }
-
+// HI!
 static void updateIo(Drivers *drivers)
 {
     drivers->canRxHandler.pollCanData();
