@@ -28,7 +28,7 @@ using tap::algorithms::limitVal;
 namespace control::chassis
 {
 // Create constructor
-ChassisSubsystem::ChassisSubsystem(Drivers &drivers, const ChassisConfig &config)
+ChassisSubsystem::ChassisSubsystem(Drivers &drivers, const ChassisConfig &config) // same btwn tank and mecanum
     : tap::control::Subsystem(&drivers),
       desiredOutput{},
       pidControllers{},
@@ -46,7 +46,7 @@ ChassisSubsystem::ChassisSubsystem(Drivers &drivers, const ChassisConfig &config
 }
 
 // Initialize function
-void ChassisSubsystem::initialize()
+void ChassisSubsystem::initialize() // same btwn tank and mecanum
 {
     for (auto &motor : motors)
     {
@@ -55,7 +55,7 @@ void ChassisSubsystem::initialize()
 }
 
 // setVelocity function
-void ChassisSubsystem::setVelocity(float leftVert, float rightVert, float leftHorz, float rightHorz)
+void ChassisSubsystem::setVelocity(float leftVert, float rightVert, float leftHorz, float rightHorz) // same btwn tank and mecanum
 {
     leftVert = mpsToRpm(leftVert);
     rightVert = mpsToRpm(rightVert);
@@ -70,7 +70,7 @@ void ChassisSubsystem::setVelocity(float leftVert, float rightVert, float leftHo
 
     // Implment Mecanum Wheel Logical Code Here
 
-
+    
 
     desiredOutput[static_cast<uint8_t>(MotorId::LF)] = "...";
     desiredOutput[static_cast<uint8_t>(MotorId::LB)] = "...";
@@ -79,7 +79,7 @@ void ChassisSubsystem::setVelocity(float leftVert, float rightVert, float leftHo
 }
 
 // STEP 5 Refresh function
-void ChassisSubsystem::refresh()
+void ChassisSubsystem::refresh() // same btwn tank and mecanum
 {
     auto runPid = [](Pid &pid, Motor &motor, float desiredOutput) {
         pid.update(desiredOutput - motor.getShaftRPM());
