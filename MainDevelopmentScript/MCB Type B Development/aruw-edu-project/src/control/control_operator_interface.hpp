@@ -40,8 +40,17 @@ public:
 
     mockable float getChassisLeftHorizontalInput();
 
+<<<<<<< HEAD
+=======
+    mockable float getChassisRightHorizontalInput();
+
+>>>>>>> dev
 
 private:
     tap::communication::serial::Remote &remote;
 };
+<<<<<<< HEAD
 }  // namespace control
+=======
+}  // namespace control
+>>>>>>> dev

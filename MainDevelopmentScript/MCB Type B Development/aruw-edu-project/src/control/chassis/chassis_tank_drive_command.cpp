@@ -30,10 +30,17 @@ using tap::algorithms::limitVal;
 namespace control::chassis
 {
 // Constructor
+<<<<<<< HEAD
 ChassisTankDriveCommand::ChassisTankDriveCommand(
     ChassisSubsystem &chassis,
     ControlOperatorInterface &operatorInterface)
     : chassis(chassis),
+=======
+ChassisTankDriveCommand::ChassisTankDriveCommand( // right of :: means method (constructor here), left is class that contains it
+    ChassisSubsystem &chassis, // ? about &
+    ControlOperatorInterface &operatorInterface)
+    : chassis(chassis), // calling constructor on chassis parameter
+>>>>>>> dev
       operatorInterface(operatorInterface)
 {
     addSubsystemRequirement(&chassis);
@@ -49,11 +56,20 @@ void ChassisTankDriveCommand::execute()
     chassis.setVelocity(
         scale(operatorInterface.getChassisLeftVerticalInput()),
         scale(operatorInterface.getChassisRightVerticalInput()),
+<<<<<<< HEAD
         scale(operatorInterface."function"),
         scale(operatorInterface."function")
+=======
+        scale(operatorInterface.getChassisLeftHorizontalInput()), // added this for left horizontal joystick
+        scale(operatorInterface.getChassisRightHorizontalInput()) // added this for right horizontal joystick
+>>>>>>> dev
         );
 }
 
 // STEP 3 (Tank Drive): end function
 void ChassisTankDriveCommand::end(bool) { chassis.setVelocity(0, 0, 0, 0); }
+<<<<<<< HEAD
 };  // namespace control::chassis
+=======
+};  // namespace control::chassis
+>>>>>>> dev

@@ -33,8 +33,26 @@ using tap::motor::MotorId;
 
 namespace control
 {
+<<<<<<< HEAD
 Robot::Robot(Drivers &drivers) : drivers(drivers)
 // STEP 3 (Tank Drive): construct ChassisSubsystem and ChassisTankDriveCommand
+=======
+Robot::Robot(Drivers &drivers) 
+    : drivers(drivers),
+      // STEP 3 (Tank Drive): construct ChassisSubsystem and ChassisTankDriveCommand
+    chassis( // calling chassis constructor
+        drivers,
+        chassis::ChassisConfig{
+            .leftFrontId = MotorId::MOTOR2,
+            .leftBackId = MotorId::MOTOR3,
+            .rightBackId = MotorId::MOTOR4,
+            .rightFrontId = MotorId::MOTOR1,
+            .canBus = CanBus::CAN_BUS2,
+            .wheelVelocityPidConfig = modm::Pid<float>::Parameter(10, 0, 0, 0, 16'000),
+        }),
+    chassisTankDrive(chassis, drivers.controlOperatorInterface), // calling chassis tankdrive constructor
+    
+>>>>>>> dev
 // STEP 3 (Agitator Control): construct VelocityAgitatorSubsystem and MoveIntegralCommand
 // STEP 8 (Agitator Control): construct HoldRepeatCommandMapping and HoldCommandMapping
 {
@@ -80,4 +98,8 @@ void Robot::registerSoldierIoMappings()
 {
     // STEP 9 (Agitator Control): register HoldRepeatCommandMapping and HoldCommandMapping
 }
+<<<<<<< HEAD
 }  // namespace control
+=======
+}  // namespace control
+>>>>>>> dev

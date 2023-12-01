@@ -40,6 +40,17 @@ float ControlOperatorInterface::getChassisRightVerticalInput()
     return limitVal(remote.getChannel(Remote::Channel::RIGHT_VERTICAL), -1.0f, 1.0f);
 }
 
+float ControlOperatorInterface::getChassisLeftHorizontalInput() // function made 11/25/23
+{
+    return limitVal(remote.getChannel(Remote::Channel::LEFT_HORIZONTAL), -1.0f, 1.0f);
+}
+
+float ControlOperatorInterface::getChassisRightHorizontalInput() // function made 11/25/23
+{
+    return limitVal(remote.getChannel(Remote::Channel::RIGHT_HORIZONTAL), -1.0f, 1.0f);
+}
+
+
 // ...
 
 

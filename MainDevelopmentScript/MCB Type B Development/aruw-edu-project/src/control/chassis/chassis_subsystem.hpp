@@ -123,4 +123,8 @@ protected:
     /// Motors.
     std::array<Motor, static_cast<uint8_t>(MotorId::NUM_MOTORS)> motors;
 };  // class ChassisSubsystem
+<<<<<<< HEAD
 }  // namespace control::chassis
+=======
+}  // namespace control::chassis
+>>>>>>> dev

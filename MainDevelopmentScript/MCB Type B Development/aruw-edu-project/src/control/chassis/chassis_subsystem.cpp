@@ -28,7 +28,11 @@ using tap::algorithms::limitVal;
 namespace control::chassis
 {
 // Create constructor
+<<<<<<< HEAD
 ChassisSubsystem::ChassisSubsystem(Drivers &drivers, const ChassisConfig &config)
+=======
+ChassisSubsystem::ChassisSubsystem(Drivers &drivers, const ChassisConfig &config) // same btwn tank and mecanum
+>>>>>>> dev
     : tap::control::Subsystem(&drivers),
       desiredOutput{},
       pidControllers{},
@@ -46,7 +50,11 @@ ChassisSubsystem::ChassisSubsystem(Drivers &drivers, const ChassisConfig &config
 }
 
 // Initialize function
+<<<<<<< HEAD
 void ChassisSubsystem::initialize()
+=======
+void ChassisSubsystem::initialize() // same btwn tank and mecanum
+>>>>>>> dev
 {
     for (auto &motor : motors)
     {
@@ -55,7 +63,11 @@ void ChassisSubsystem::initialize()
 }
 
 // setVelocity function
+<<<<<<< HEAD
 void ChassisSubsystem::setVelocity(float leftVert, float rightVert, float leftHorz, float rightHorz)
+=======
+void ChassisSubsystem::setVelocity(float leftVert, float rightVert, float leftHorz, float rightHorz) // same btwn tank and mecanum
+>>>>>>> dev
 {
     leftVert = mpsToRpm(leftVert);
     rightVert = mpsToRpm(rightVert);
@@ -70,7 +82,11 @@ void ChassisSubsystem::setVelocity(float leftVert, float rightVert, float leftHo
 
     // Implment Mecanum Wheel Logical Code Here
 
+<<<<<<< HEAD
 
+=======
+    
+>>>>>>> dev
 
     desiredOutput[static_cast<uint8_t>(MotorId::LF)] = "...";
     desiredOutput[static_cast<uint8_t>(MotorId::LB)] = "...";
@@ -79,7 +95,11 @@ void ChassisSubsystem::setVelocity(float leftVert, float rightVert, float leftHo
 }
 
 // STEP 5 Refresh function
+<<<<<<< HEAD
 void ChassisSubsystem::refresh()
+=======
+void ChassisSubsystem::refresh() // same btwn tank and mecanum
+>>>>>>> dev
 {
     auto runPid = [](Pid &pid, Motor &motor, float desiredOutput) {
         pid.update(desiredOutput - motor.getShaftRPM());
@@ -91,4 +111,8 @@ void ChassisSubsystem::refresh()
         runPid(pidControllers[ii], motors[ii], desiredOutput[ii]);
     }
 }
+<<<<<<< HEAD
 }  // namespace control::chassis
+=======
+}  // namespace control::chassis
+>>>>>>> dev

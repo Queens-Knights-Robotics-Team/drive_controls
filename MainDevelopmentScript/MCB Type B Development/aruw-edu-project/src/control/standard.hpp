@@ -62,4 +62,8 @@ private:
 
     // STEP 7 (Agitator Control): declare HoldCommandMapping (leftMousePressed)
 };
+<<<<<<< HEAD
 }  // namespace control
+=======
+}  // namespace control
+>>>>>>> dev

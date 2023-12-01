@@ -23,4 +23,8 @@
 #include "standard.hpp"
 #else
 #error "standard only robot supported"
+<<<<<<< HEAD
 #endif
+=======
+#endif
+>>>>>>> dev
