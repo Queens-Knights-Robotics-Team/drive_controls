@@ -43,7 +43,7 @@ Robot::Robot(Drivers &drivers)
             .leftBackId = MotorId::MOTOR3,
             .rightBackId = MotorId::MOTOR4,
             .rightFrontId = MotorId::MOTOR1,
-            .canBus = CanBus::CAN_BUS2,
+            .canBus = CanBus::CAN_BUS1,
             .wheelVelocityPidConfig = modm::Pid<float>::Parameter(10, 0, 0, 0, 16'000),
         }),
     chassisTankDrive(chassis, drivers.controlOperatorInterface), // calling chassis tankdrive constructor
