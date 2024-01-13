@@ -72,8 +72,8 @@ void ChassisSubsystem::setVelocity(float leftVert, float rightVert, float leftHo
 
     desiredOutput[static_cast<uint8_t>(MotorId::LF)] = leftVert + leftHorz + rightHorz;
     desiredOutput[static_cast<uint8_t>(MotorId::LB)] = leftVert - leftHorz + rightHorz;
-    desiredOutput[static_cast<uint8_t>(MotorId::RB)] = leftVert + leftHorz - rightHorz;
     desiredOutput[static_cast<uint8_t>(MotorId::RF)] = leftVert - leftHorz - rightHorz;
+    desiredOutput[static_cast<uint8_t>(MotorId::RB)] = leftVert + leftHorz - rightHorz;
 }
 
 // STEP 5 Refresh function
