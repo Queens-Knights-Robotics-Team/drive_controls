@@ -41,8 +41,8 @@ struct ChassisConfig
 {
     tap::motor::MotorId leftFrontId;
     tap::motor::MotorId leftBackId;
-    tap::motor::MotorId rightFrontId;
     tap::motor::MotorId rightBackId;
+    tap::motor::MotorId rightFrontId;
     tap::can::CanBus canBus;
     modm::Pid<float>::Parameter wheelVelocityPidConfig;
 };
@@ -58,8 +58,8 @@ public:
     {
         LF = 0,  ///< Left front
         LB,      ///< Left back
-        RF,      ///< Right front
         RB,      ///< Right back
+        RF,      ///< Right front
         NUM_MOTORS,
     };
 
