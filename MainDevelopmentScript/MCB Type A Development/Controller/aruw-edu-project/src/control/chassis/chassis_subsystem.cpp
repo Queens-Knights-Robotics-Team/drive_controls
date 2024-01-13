@@ -69,11 +69,11 @@ void ChassisSubsystem::setVelocity(float leftVert, float rightVert, float leftHo
     rightHorz = limitVal(rightHorz, -MAX_WHEELSPEED_RPM, MAX_WHEELSPEED_RPM);
 
     // Implment Mecanum Wheel Logical Code Here
-    
+
     desiredOutput[static_cast<uint8_t>(MotorId::LF)] = leftVert + leftHorz + rightHorz;
-    desiredOutput[static_cast<uint8_t>(MotorId::LB)] = leftVert - leftHorz - rightHorz;
+    desiredOutput[static_cast<uint8_t>(MotorId::LB)] = leftVert - leftHorz + rightHorz;
     desiredOutput[static_cast<uint8_t>(MotorId::RB)] = leftVert + leftHorz - rightHorz;
-    desiredOutput[static_cast<uint8_t>(MotorId::RF)] = leftVert - leftHorz + rightHorz;
+    desiredOutput[static_cast<uint8_t>(MotorId::RF)] = leftVert - leftHorz - rightHorz;
 }
 
 // STEP 5 Refresh function
