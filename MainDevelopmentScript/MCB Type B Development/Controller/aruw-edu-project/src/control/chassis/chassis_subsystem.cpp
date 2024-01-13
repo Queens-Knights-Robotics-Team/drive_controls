@@ -35,8 +35,8 @@ ChassisSubsystem::ChassisSubsystem(Drivers &drivers, const ChassisConfig &config
       motors{
           Motor(&drivers, config.leftFrontId, config.canBus, false, "LF"),
           Motor(&drivers, config.leftBackId, config.canBus, false, "LB"),
-          Motor(&drivers, config.rightBackId, config.canBus, true, "RB"),
-          Motor(&drivers, config.rightFrontId, config.canBus, true, "RF"),
+          Motor(&drivers, config.rightBackId, config.canBus, true, "RF"),
+          Motor(&drivers, config.rightFrontId, config.canBus, true, "RB"),
       }
 {
     for (auto &controller : pidControllers)
