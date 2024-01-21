@@ -22,36 +22,69 @@
 #include "tap/algorithms/math_user_utils.hpp"
 #include "tap/communication/serial/remote.hpp"
 
-using tap::algorithms::limitVal;
-using tap::communication::serial::Remote;
+namespace control {
 
-namespace control
-{
-ControlOperatorInterface::ControlOperatorInterface(Remote &remote) : remote(remote) {}
+ControlOperatorInterface::ControlOperatorInterface(tap::communication::serial::Remote &remote)
+    : remote(remote) {}
 
-// STEP 2 (Tank Drive): Add ggetChassisLeftVerticalInput, getChassisLeftHorizontalInput, and getChassisRightHorizontalInput functions
-float ControlOperatorInterface::getChassisLeftVerticalInput()
-{
-    return limitVal(remote.getChannel(Remote::Channel::LEFT_VERTICAL), -1.0f, 1.0f);
+float ControlOperatorInterface::getChassisOmniLeftFrontInput() {
+    float horizontal = remote.keyPressed(tap::communication::serial::Remote::Key::A) ? -1.0f :
+                       remote.keyPressed(tap::communication::serial::Remote::Key::D) ? 1.0f : 0.0f;
+    float vertical = remote.keyPressed(tap::communication::serial::Remote::Key::W) ? 1.0f :
+                     remote.keyPressed(tap::communication::serial::Remote::Key::S) ? -1.0f : 0.0f;
+    float mouseInput = static_cast<float>(remote.getMouseX());
+
+    return vertical + horizontal + mouseInput;
 }
 
-float ControlOperatorInterface::getChassisRightVerticalInput()
-{
-    return limitVal(remote.getChannel(Remote::Channel::RIGHT_VERTICAL), -1.0f, 1.0f);
+float ControlOperatorInterface::getChassisOmniLeftBackInput() {
+    float horizontal = remote.keyPressed(tap::communication::serial::Remote::Key::A) ? -1.0f :
+                       remote.keyPressed(tap::communication::serial::Remote::Key::D) ? 1.0f : 0.0f;
+    float vertical = remote.keyPressed(tap::communication::serial::Remote::Key::W) ? 1.0f :
+                     remote.keyPressed(tap::communication::serial::Remote::Key::S) ? -1.0f : 0.0f;
+    float mouseInput = static_cast<float>(remote.getMouseX());
+
+    return vertical - horizontal + mouseInput;
 }
 
-float ControlOperatorInterface::getChassisLeftHorizontalInput() // function made 11/25/23
-{
-    return limitVal(remote.getChannel(Remote::Channel::LEFT_HORIZONTAL), -1.0f, 1.0f);
+float ControlOperatorInterface::getChassisOmniRightFrontInput() {
+    float horizontal = remote.keyPressed(tap::communication::serial::Remote::Key::A) ? -1.0f :
+                       remote.keyPressed(tap::communication::serial::Remote::Key::D) ? 1.0f : 0.0f;
+    float vertical = remote.keyPressed(tap::communication::serial::Remote::Key::W) ? 1.0f :
+                     remote.keyPressed(tap::communication::serial::Remote::Key::S) ? -1.0f : 0.0f;
+    float mouseInput = static_cast<float>(remote.getMouseX());
+
+    return vertical - horizontal - mouseInput;
 }
 
-float ControlOperatorInterface::getChassisRightHorizontalInput() // function made 11/25/23
-{
-    return limitVal(remote.getChannel(Remote::Channel::RIGHT_HORIZONTAL), -1.0f, 1.0f);
+float ControlOperatorInterface::getChassisOmniRightBackInput() {
+    float horizontal = remote.keyPressed(tap::communication::serial::Remote::Key::A) ? -1.0f :
+                       remote.keyPressed(tap::communication::serial::Remote::Key::D) ? 1.0f : 0.0f;
+    float vertical = remote.keyPressed(tap::communication::serial::Remote::Key::W) ? 1.0f :
+                     remote.keyPressed(tap::communication::serial::Remote::Key::S) ? -1.0f : 0.0f;
+    float mouseInput = static_cast<float>(remote.getMouseX());
+
+    return vertical + horizontal - mouseInput;
 }
 
+float ControlOperatorInterface::getChassisLeftVerticalInput() {
+    return remote.keyPressed(tap::communication::serial::Remote::Key::W) ? 1.0f :
+           remote.keyPressed(tap::communication::serial::Remote::Key::S) ? -1.0f : 0.0f;
+}
 
-// ...
+float ControlOperatorInterface::getChassisRightVerticalInput() {
+    return remote.keyPressed(tap::communication::serial::Remote::Key::E) ? 1.0f :
+           remote.keyPressed(tap::communication::serial::Remote::Key::R) ? -1.0f : 0.0f;
+}
 
+float ControlOperatorInterface::getChassisLeftHorizontalInput() {
+    return remote.keyPressed(tap::communication::serial::Remote::Key::A) ? -1.0f :
+           remote.keyPressed(tap::communication::serial::Remote::Key::D) ? 1.0f : 0.0f;
+}
 
-}  // namespace control
+float ControlOperatorInterface::getChassisRightHorizontalInput() {
+    float mouseInput = static_cast<float>(remote.getMouseX());
+    return mouseInput; // Using mouse X movement for right horizontal control
+}
+
+} // namespace control

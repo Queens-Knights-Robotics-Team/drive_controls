@@ -19,31 +19,26 @@
 
 #pragma once
 
-#include "tap/util_macros.hpp"
+#include "tap/communication/serial/remote.hpp"
 
-namespace tap::communication::serial
-{
-class Remote;
-}
+namespace control {
 
-namespace control
-{
-class ControlOperatorInterface
-{
+class ControlOperatorInterface {
 public:
-    ControlOperatorInterface(tap::communication::serial::Remote &remote);
+    explicit ControlOperatorInterface(tap::communication::serial::Remote &remote);
 
-    // Add getChassisLeftVerticalInput, getChassisLeftHorizontalInput, getChassisRightVerticalInput, and getChassisRightHorizontalInput functions
-    mockable float getChassisLeftVerticalInput();
+    float getChassisOmniLeftFrontInput();
+    float getChassisOmniLeftBackInput();
+    float getChassisOmniRightFrontInput();
+    float getChassisOmniRightBackInput();
 
-    mockable float getChassisRightVerticalInput();
-
-    mockable float getChassisLeftHorizontalInput();
-
-    mockable float getChassisRightHorizontalInput();
-
+    float getChassisLeftVerticalInput();
+    float getChassisRightVerticalInput();
+    float getChassisLeftHorizontalInput();
+    float getChassisRightHorizontalInput();
 
 private:
     tap::communication::serial::Remote &remote;
 };
-}  // namespace control
+
+} // namespace control
