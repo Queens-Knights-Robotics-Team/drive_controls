@@ -46,7 +46,7 @@ Robot::Robot(Drivers &drivers)
             .canBus = CanBus::CAN_BUS1,
             .wheelVelocityPidConfig = modm::Pid<float>::Parameter(10, 0, 0, 0, 16'000),
         }),
-    chassisTankDrive(chassis, drivers.controlOperatorInterface), // calling chassis tankdrive constructor
+    chassisTankDrive(chassis, drivers.controlOperatorInterface)// calling chassis tankdrive constructor
     
 // STEP 3 (Agitator Control): construct VelocityAgitatorSubsystem and MoveIntegralCommand
 // STEP 8 (Agitator Control): construct HoldRepeatCommandMapping and HoldCommandMapping
@@ -67,7 +67,7 @@ void Robot::initializeSubsystems()
     // STEP 4 (Tank Drive): initialize declared ChassisSubsystem
     chassis.initialize();
     // STEP 4 (Agitator Control): initialize declared VelocityAgitatorSubsystem
-    agitatorSubsystem.initialize();
+    //agitatorSubsystem.initialize();
 }
 
 void Robot::registerSoldierSubsystems()

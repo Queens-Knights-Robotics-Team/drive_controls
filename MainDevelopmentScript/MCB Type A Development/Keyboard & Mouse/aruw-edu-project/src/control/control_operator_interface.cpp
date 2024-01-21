@@ -73,8 +73,8 @@ float ControlOperatorInterface::getChassisLeftVerticalInput() {
 }
 
 float ControlOperatorInterface::getChassisRightVerticalInput() {
-    return remote.keyPressed(tap::communication::serial::Remote::Key::UP_ARROW) ? 1.0f :
-           remote.keyPressed(tap::communication::serial::Remote::Key::DOWN_ARROW) ? -1.0f : 0.0f;
+    return remote.keyPressed(tap::communication::serial::Remote::Key::E) ? 1.0f :
+           remote.keyPressed(tap::communication::serial::Remote::Key::R) ? -1.0f : 0.0f;
 }
 
 float ControlOperatorInterface::getChassisLeftHorizontalInput() {
