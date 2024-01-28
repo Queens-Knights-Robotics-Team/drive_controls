@@ -1,0 +1,11 @@
+lxml
+sphinx==5.1.1
+breathe
+exhale
+sphinx_rtd_theme
+myst-parser
+linkify-it-py
+sphinx-autodoc-typehints
+sphinxcontrib-mermaid
+sphinxcontrib-youtube
+sphinx-rtd-dark-mode

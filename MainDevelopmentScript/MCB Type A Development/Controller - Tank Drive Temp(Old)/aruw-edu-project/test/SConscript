@@ -1,0 +1,52 @@
+# Copyright (c) 2020-2021 Advanced Robotics at the University of Washington <robomstr@uw.edu>
+#
+# This file is part of aruw-edu-project.
+#
+# aruw-edu-project is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# aruw-edu-project is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with aruw-edu-project.  If not, see <https://www.gnu.org/licenses/>.
+
+from os.path import split, samefile, join
+
+Import("env")
+Import("args")
+Import("sources")
+
+
+if args["TARGET_ENV"] == "tests":
+    env_cpy = env.Clone()
+
+    # Append on the global robot target build flag
+    env_cpy.AppendUnique(CCFLAGS=["-D " + args["ROBOT_TYPE"]])
+
+    rawSrcs = env_cpy.FindSourceFiles(".")
+
+    def append_with_prefix(prefix):
+        for source in rawSrcs:
+            try:
+                if samefile(join(prefix, split(source)[1]), source):
+                    sources.append(env_cpy.Object(source))
+            except FileNotFoundError:
+                pass
+
+    sources.append(env_cpy.Object("control/standard_tests.cpp"))
+
+    if "tank_drive" in args["TUTORIALS"]:
+        print("building tests for tank drive")
+        append_with_prefix("control/chassis")
+        sources.append(env_cpy.Object("control/control_operator_interface_tests.cpp"))
+    if "agitator_control" in args["TUTORIALS"]:
+        print("building tests for agitator control")
+        append_with_prefix("control/agitator")
+        append_with_prefix("control/algorithms")
+
+Return('sources')
