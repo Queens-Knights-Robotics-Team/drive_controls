@@ -1,0 +1,3 @@
+[submodule "testing/aruw-edu"]
+	path = testing/aruw-edu
+	url = git@gitlab.com:aruw/controls/aruw-edu.git
