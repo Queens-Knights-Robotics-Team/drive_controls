@@ -1,7 +1,9 @@
 #!/bin/zsh
 
 if [ ! -d "${HOME}/.qkrt" ]; then
+    echo "[IMPORTANT] making '~/.qkrt' directory"
     mkdir ~/.qkrt
+else; echo "[INFO] '~/.qkrt' directory already exists"
 fi
 
 git submodule update --init --recursive
@@ -51,8 +53,9 @@ fi
 # install python tools
 # TODO: create symlink for 'python' command to make scripts cross-platform
 if ! command -v python3 &> /dev/null; then
+    echo "[IMPORTANT] installing 'python3' formula"
     brew install python3
-else; echo "[INFO] 'python' is already installed"
+else; echo "[INFO] 'python3' is already installed"
 fi
 if [ $(pip3 list | grep -c pipenv) -eq 0 ]; then
     echo "\t[IMPORTANT] installing 'pipenv' python package"
@@ -60,7 +63,8 @@ if [ $(pip3 list | grep -c pipenv) -eq 0 ]; then
 else; echo "\t[INFO] 'pipenv' package already installed"
 fi
 if [ $(pip list | grep SCons | awk 'NF>1{print $NF}') != "4.1.0" ]; then
-    if [ $(pip3 list | grep -c pyelftools) -ne 0 ];  then
+    if [ $(pip3 list | grep -c SCons) -ne 0 ];  then
+        echo "[IMPORTANT] uninstalling incorrect version of SCons... select [Y]"
         pip3 uninstall scons
     fi
     echo "\t[IMPORTANT] installing 'SCons' python package (version 4.1.0)"
