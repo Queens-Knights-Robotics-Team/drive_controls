@@ -6,6 +6,11 @@ if [ ! -d "${HOME}/.qkrt" ]; then
 else; echo "[INFO] '~/.qkrt' directory already exists"
 fi
 
+if ! command -v git &> /dev/null; then
+    echo "[IMPORTANT] installing 'git' formula"
+    brew install git --quiet
+else; echo "[INFO] 'git' is already installed"
+fi
 git submodule update --init --recursive
 
 if ! command -v brew &> /dev/null; then
@@ -14,11 +19,6 @@ if ! command -v brew &> /dev/null; then
 else; echo "[INFO] 'homebrew' is already installed"
 fi
 
-if ! command -v git &> /dev/null; then
-    echo "[IMPORTANT] installing 'git' formula"
-    brew install git --quiet
-else; echo "[INFO] 'git' is already installed"
-fi
 
 # install ARM (target device) toolchain and tools
 brew tap osx-cross/arm
