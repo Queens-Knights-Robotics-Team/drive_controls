@@ -7,12 +7,14 @@ fi
 git submodule update --init --recursive
 
 if ! command -v brew &> /dev/null; then
+    echo "[IMPORTANT] installing 'homebrew'"
     /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 else; echo "[INFO] 'homebrew' is already installed"
 fi
 
 if ! command -v git &> /dev/null; then
-    brew install git
+    echo "[IMPORTANT] installing 'git' formula"
+    brew install git --quiet
 else; echo "[INFO] 'git' is already installed"
 fi
 
