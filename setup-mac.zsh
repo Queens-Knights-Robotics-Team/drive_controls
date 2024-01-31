@@ -62,14 +62,15 @@ if [ $(pip3 list | grep -c pipenv) -eq 0 ]; then
     pip3 install pipenv
 else; echo "\t[INFO] 'pipenv' package already installed"
 fi
-if [ $(pip list | grep SCons | awk 'NF>1{print $NF}') != "4.1.0" ]; then
-    if [ $(pip3 list | grep -c SCons) -ne 0 ];  then
-        echo "[IMPORTANT] uninstalling incorrect version of SCons... select [Y]"
-        pip3 uninstall scons
-    fi
+if [ $(pip3 list | grep -c SCons) -eq 0 ]; then
+    echo "\t[IMPORTANT] installing 'SCons' python package (version 4.1.1)"
+    pip3 install -U scons==4.1 --quiet
+elif [ $(pip3 list | grep SCons | awk 'NF>1{print $NF}') != "4.1.0" ]; then
+    echo "\t[IMPORTANT] uninstalling incorrect version of SCons... select [Y]"
+    pip3 uninstall scons
     echo "\t[IMPORTANT] installing 'SCons' python package (version 4.1.0)"
     pip3 install -U scons==4.1 --quiet
-else; echo "\t[INFO] 'SCons' package already installed"
+else; echo "\t[INFO] 'SCons' package is already installed"
 fi
 if [ $(pip3 list | grep -c pyelftools) -eq 0 ];  then
     echo "\t[IMPORTANT] installing 'pyelftools' python package"
