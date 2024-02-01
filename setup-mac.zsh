@@ -21,7 +21,7 @@ fi
 
 
 # install ARM (target device) toolchain and tools
-brew tap osx-cross/arm
+brew tap osx-cross/arm --quiet
 if ! brew ls --versions arm-gcc-bin &> /dev/null; then
     echo "[IMPORTANT] installing 'arm-gcc-bin' formula"
     brew install arm-gcc-bin --quiet
@@ -54,12 +54,12 @@ fi
 # TODO: create symlink for 'python' command to make scripts cross-platform
 if ! command -v python3 &> /dev/null; then
     echo "[IMPORTANT] installing 'python3' formula"
-    brew install python3
+    brew install python3 --quiet
 else; echo "[INFO] 'python3' is already installed"
 fi
 if [ $(pip3 list | grep -c pipenv) -eq 0 ]; then
     echo "\t[IMPORTANT] installing 'pipenv' python package"
-    pip3 install pipenv
+    pip3 install pipenv -y --quiet
 else; echo "\t[INFO] 'pipenv' package already installed"
 fi
 if [ $(pip3 list | grep -c SCons) -eq 0 ]; then
@@ -67,19 +67,19 @@ if [ $(pip3 list | grep -c SCons) -eq 0 ]; then
     pip3 install -U scons==4.1 --quiet
 elif [ $(pip3 list | grep SCons | awk 'NF>1{print $NF}') != "4.1.0" ]; then
     echo "\t[IMPORTANT] uninstalling incorrect version of SCons... select [Y]"
-    pip3 uninstall scons
+    pip3 uninstall scons -y --quiet
     echo "\t[IMPORTANT] installing 'SCons' python package (version 4.1.0)"
     pip3 install -U scons==4.1 --quiet
 else; echo "\t[INFO] 'SCons' package is already installed"
 fi
 if [ $(pip3 list | grep -c pyelftools) -eq 0 ];  then
     echo "\t[IMPORTANT] installing 'pyelftools' python package"
-    pip3 install pyelftools --quiet
+    pip3 install pyelftools -y --quiet
 else; echo "\t[INFO] 'pyelftools' package already installed"
 fi
 if [ $(pip3 list | grep -c Jinja2) -eq 0 ]; then
     echo "\t[IMPORTANT] installing 'Jinja2' python package"
-    pip3 install Jinja2 --quiet
+    pip3 install Jinja2 -y --quiet
 else; echo "\t[INFO] 'Jinja2' package already installed"
 fi
 
