@@ -41,10 +41,10 @@ else echo "[INFO] 'doxygen' is already installed"
 fi
 
 # install python tools
-if ! command -v python3 &> /dev/null; then
-    echo "[IMPORTANT] installing 'python3'"
-    sudo apt-get install python3 -y -qq >/dev/null
-else echo "[INFO] 'python3' is already installed"
+if ! command -v python3.12 &> /dev/null; then
+    echo "[IMPORTANT] installing 'python3.12'"
+    sudo apt-get install python3.12 -y -qq >/dev/null
+else echo "[INFO] 'python3.12' is already installed"
 fi
 if ! command -v pip3 &> /dev/null; then
     echo "[IMPORTANT] installing 'pip3'"
