@@ -35,7 +35,7 @@ class ChassisSubsystem;
  * commanded independently by this command. This command executes constantly, taking remote inputs
  * in from a control operator interface, transforming remote input into chassis speed.
  */
-class ChassisOmniDriveCommand : public tap::control::Command
+class ChassisTankDriveCommand : public tap::control::Command
 {
 public:
     static constexpr float MAX_CHASSIS_SPEED_MPS = 3.0f;
@@ -45,9 +45,9 @@ public:
      *
      * @param chassis Chassis to control.
      */
-    ChassisOmniDriveCommand(ChassisSubsystem &chassis, ControlOperatorInterface &operatorInterface);
+    ChassisTankDriveCommand(ChassisSubsystem &chassis, ControlOperatorInterface &operatorInterface);
 
-    const char *getName() const override { return "Chassis omni drive"; }
+    const char *getName() const override { return "Chassis main drive"; }
 
     void initialize() override {}
 

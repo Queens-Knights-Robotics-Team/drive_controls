@@ -33,10 +33,16 @@ class ControlOperatorInterface
 public:
     ControlOperatorInterface(tap::communication::serial::Remote &remote);
 
-    float getChassisOmniLeftFrontInput();
-    float getChassisOmniLeftBackInput();
-    float getChassisOmniRightFrontInput();
-    float getChassisOmniRightBackInput();
+    // Add getChassisLeftVerticalInput, getChassisLeftHorizontalInput, getChassisRightVerticalInput, and getChassisRightHorizontalInput functions
+    mockable float getChassisLeftVerticalInput();
+
+    mockable float getChassisRightVerticalInput();
+
+    mockable float getChassisLeftHorizontalInput();
+
+    mockable float getChassisRightHorizontalInput();
+
+
 private:
     tap::communication::serial::Remote &remote;
 };

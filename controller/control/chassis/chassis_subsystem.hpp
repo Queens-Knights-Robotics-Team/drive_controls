@@ -58,8 +58,8 @@ public:
     {
         LF = 0,  ///< Left front
         LB,      ///< Left back
-        RF,      ///< Right front
         RB,      ///< Right back
+        RF,      ///< Right front
         NUM_MOTORS,
     };
 
@@ -81,20 +81,20 @@ public:
     void initialize() override;
 
     ///
-    /// @brief Control the chassis using omni drive. Sets the wheel velocity of the four drive
-    /// motors individually based on on the input left/right desired velocity.
+    /// @brief Control the chassis using tank drive. Sets the wheel velocity of the four drive
+    /// motors based on the input left/right desired velocity.
     ///
-    /// @param leftFront Desired speed in m/s of the left-front wheel of the chassis. Positive speed is
-    /// forward, negative is backwards.
-    /// @param leftBack Desired speed in m/s of the left-back wheel of the chassis. Positive speed is
-    /// forward, negative is backwards.
-    /// @param rightFront Desired chassis speed in m/s of the right-front of the chassis. Positive speed is
-    /// forward, negative is backwards.
-    /// @param rightBack Desired speed in m/s of the right-back wheel of the chassis. Positive speed is
-    /// forward, negative is backwards.
+    /// @param leftVert 
     ///
-    void setVelocityOmniDrive(float leftFront, float leftBack, float rightFront, float rightBack);
-    
+    /// @param rightVert 
+    ///
+    /// @param leftHorz 
+    ///
+    /// @param rightHorz 
+    ///
+
+    mockable void setVelocity(float leftVert, float rightVert, float leftHorz, float rightHorz);
+
     ///
     /// @brief Runs velocity PID controllers for the drive motors.
     ///

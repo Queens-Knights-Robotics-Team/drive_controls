@@ -23,8 +23,9 @@
 #include "tap/control/hold_repeat_command_mapping.hpp"
 #include "tap/control/setpoint/commands/move_integral_command.hpp"
 
+#include "control/agitator/velocity_agitator_subsystem.hpp"
 #include "control/chassis/chassis_subsystem.hpp"
-#include "control/chassis/chassis_omni_drive_command.hpp"
+#include "control/chassis/chassis_tank_drive_command.hpp"
 
 class Drivers;
 
@@ -50,6 +51,15 @@ private:
     chassis::ChassisSubsystem chassis;
 
     // STEP 2 (Tank Drive): declare ChassisTankDriveCommand
-    chassis::ChassisOmniDriveCommand chassisOmniDrive;
+    chassis::ChassisTankDriveCommand chassisTankDrive;
+
+
+    // STEP 1 (Agitator Control): declare VelocityAgitatorSubsystem
+
+    // STEP 2 (Agitator Control): declare MoveIntegralCommand
+
+    // STEP 6 (Agitator Control): declare HoldRepeatCommandMapping (rightSwitchUp)
+
+    // STEP 7 (Agitator Control): declare HoldCommandMapping (leftMousePressed)
 };
 }  // namespace control

@@ -29,123 +29,29 @@ namespace control
 {
 ControlOperatorInterface::ControlOperatorInterface(Remote &remote) : remote(remote) {}
 
-// STEP 2 (Tank Drive): Add getChassisTankLeftInput and getChassisTankRightInput function
-// definitions
-float ControlOperatorInterface::getChassisOmniLeftFrontInput() {
-    //float result = vertical + horizonttal + right horizontal
-    if  (remote.keyPressed(Remote::Key::W)){
-        float vertical   = limitVal((Remote::Key::W), 1.0f, -1.0f, 1.0f);
-        float result = vertical;
-        return result;
-    }
-    else if (remote.keyPressed(Remote::Key::A)){
-        float horizontal = limitVal((Remote::Key::A),-1.0f, -1.0f, 1.0f);
-        float result = horizontal;
-        return result;
-    } 
-    else if (remote.keyPressed(Remote::Key::S)){
-        float vertical   = limitVal((Remote::Key::S), -1.0f, -1.0f, 1.0f);
-        float result = vertical;
-        return result;
-    }
-    else if (remote.keyPressed(Remote::Key::D)){
-        float horizontal = limitVal((Remote::Key::D),1.0f, -1.0f, 1.0f);
-        float result = horizontal;
-        return result;
-    }
-    else{
-        float vertical = limitVal(0.0f, 1.0f,1.0f);
-        float result = vertical;
-        return result
-    }
+// STEP 2 (Tank Drive): Add ggetChassisLeftVerticalInput, getChassisLeftHorizontalInput, and getChassisRightHorizontalInput functions
+float ControlOperatorInterface::getChassisLeftVerticalInput()
+{
+    return limitVal(remote.getChannel(Remote::Channel::LEFT_VERTICAL), -1.0f, 1.0f);
 }
 
-float ControlOperatorInterface::getChassisOmniLeftBackInput() {
-    //float result = vertical - horizontal + rightHorizontal;
-    if  (remote.keyPressed(Remote::Key::W)){
-        float vertical   = limitVal((Remote::Key::W), 1.0f, -1.0f, 1.0f);
-        float result = vertical;
-        return result;
-    }
-    else if (remote.keyPressed(Remote::Key::A)){
-        float horizontal = limitVal((Remote::Key::A),-1.0f, -1.0f, 1.0f);
-        float result = horizontal;
-        return result;
-    } 
-    else if (remote.keyPressed(Remote::Key::S)){
-        float vertical   = limitVal((Remote::Key::S), -1.0f, -1.0f, 1.0f);
-        float result = vertical;
-        return result;
-    }
-    else if (remote.keyPressed(Remote::Key::D)){
-        float horizontal = limitVal((Remote::Key::D),1.0f, -1.0f, 1.0f);
-        float result = horizontal;
-        return result;
-    }
-    else{
-        float vertical = limitVal(0.0f, 1.0f,1.0f);
-        float result = vertical;
-        return result
-    }
+float ControlOperatorInterface::getChassisRightVerticalInput()
+{
+    return limitVal(remote.getChannel(Remote::Channel::RIGHT_VERTICAL), -1.0f, 1.0f);
 }
 
-float ControlOperatorInterface::getChassisOmniRightFrontInput() {
-    //float result = vertical - horizontal - rightHorizontal;
-
-    if  (remote.keyPressed(Remote::Key::W)){
-        float vertical   = limitVal((Remote::Key::W), 1.0f, -1.0f, 1.0f);
-        float result = vertical;
-        return result;
-    }
-    else if (remote.keyPressed(Remote::Key::A)){
-        float horizontal = limitVal((Remote::Key::A),-1.0f, -1.0f, 1.0f);
-        float result = horizontal;
-        return result;
-    } 
-    else if (remote.keyPressed(Remote::Key::S)){
-        float vertical   = limitVal((Remote::Key::S), -1.0f, -1.0f, 1.0f);
-        float result = vertical;
-        return result;
-    }
-    else if (remote.keyPressed(Remote::Key::D)){
-        float horizontal = limitVal((Remote::Key::D),1.0f, -1.0f, 1.0f);
-        float result = horizontal;
-        return result;
-    }
-    else{
-        float vertical = limitVal(0.0f, 1.0f,1.0f);
-        float result = vertical;
-        return result
-    }
+float ControlOperatorInterface::getChassisLeftHorizontalInput() // function made 11/25/23
+{
+    return limitVal(remote.getChannel(Remote::Channel::LEFT_HORIZONTAL), -1.0f, 1.0f);
 }
 
-float ControlOperatorInterface::getChassisOmniRightBackInput() {
-    //float result = vertical + horizontal - rightHorizontal;
-    if  (remote.keyPressed(Remote::Key::W)){
-        float vertical   = limitVal((Remote::Key::W), 1.0f, -1.0f, 1.0f);
-        float result = vertical;
-        return result;
-    }
-    else if (remote.keyPressed(Remote::Key::A)){
-        float horizontal = limitVal((Remote::Key::A),-1.0f, -1.0f, 1.0f);
-        float result = horizontal;
-        return result;
-    } 
-    else if (remote.keyPressed(Remote::Key::S)){
-        float vertical   = limitVal((Remote::Key::S), -1.0f, -1.0f, 1.0f);
-        float result = vertical;
-        return result;
-    }
-    else if (remote.keyPressed(Remote::Key::D)){
-        float horizontal = limitVal((Remote::Key::D),1.0f, -1.0f, 1.0f);
-        float result = horizontal;
-        return result;
-    }
-    else{
-        float vertical = limitVal(0.0f, 1.0f,1.0f);
-        float result = vertical;
-        return result
-    }
+float ControlOperatorInterface::getChassisRightHorizontalInput() // function made 11/25/23
+{
+    return limitVal(remote.getChannel(Remote::Channel::RIGHT_HORIZONTAL), -1.0f, 1.0f);
 }
 
-}  // namespace control 
+
+// ...
+
+
+}  // namespace control

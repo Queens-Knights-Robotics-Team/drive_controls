@@ -27,16 +27,16 @@ using tap::algorithms::limitVal;
 
 namespace control::chassis
 {
-// STEP 1 (Tank Drive): create constructor
-ChassisSubsystem::ChassisSubsystem(Drivers &drivers, const ChassisConfig &config)
+// Create constructor
+ChassisSubsystem::ChassisSubsystem(Drivers &drivers, const ChassisConfig &config) // same btwn tank and mecanum
     : tap::control::Subsystem(&drivers),
       desiredOutput{},
       pidControllers{},
       motors{
           Motor(&drivers, config.leftFrontId, config.canBus, false, "LF"),
           Motor(&drivers, config.leftBackId, config.canBus, false, "LB"),
+          Motor(&drivers, config.rightBackId, config.canBus, true, "RB"),
           Motor(&drivers, config.rightFrontId, config.canBus, true, "RF"),
-          Motor(&drivers, config.rightBackId, config.canBus, true, "RB")
       }
 {
     for (auto &controller : pidControllers)
@@ -45,8 +45,8 @@ ChassisSubsystem::ChassisSubsystem(Drivers &drivers, const ChassisConfig &config
     }
 }
 
-// STEP 2 (Tank Drive): initialize function
-void ChassisSubsystem::initialize()
+// Initialize function
+void ChassisSubsystem::initialize() // same btwn tank and mecanum
 {
     for (auto &motor : motors)
     {
@@ -54,30 +54,30 @@ void ChassisSubsystem::initialize()
     }
 }
 
-// STEP 4 (Tank Drive): setVelocityOmniDrive function
-void ChassisSubsystem::setVelocityOmniDrive(float leftFront,
-                                            float leftBack,
-                                            float rightFront,
-                                            float rightBack)
+// setVelocity function
+void ChassisSubsystem::setVelocity(float leftVert, float rightVert, float leftHorz, float rightHorz) // same btwn tank and mecanum
 {
-    leftFront  = mpsToRpm(leftFront);
-    leftBack   = mpsToRpm(leftBack);
-    rightFront = mpsToRpm(rightFront);
-    rightBack  = mpsToRpm(rightBack);
+    leftVert = mpsToRpm(leftVert);
+    rightVert = mpsToRpm(rightVert);
+    leftHorz = mpsToRpm(leftHorz);
+    rightHorz = mpsToRpm(rightHorz);
 
-    leftFront  = limitVal(leftFront, -MAX_WHEELSPEED_RPM, MAX_WHEELSPEED_RPM);
-    leftBack   = limitVal(leftBack, -MAX_WHEELSPEED_RPM, MAX_WHEELSPEED_RPM);
-    rightFront = limitVal(rightFront, -MAX_WHEELSPEED_RPM, MAX_WHEELSPEED_RPM);
-    rightBack  = limitVal(rightBack, -MAX_WHEELSPEED_RPM, MAX_WHEELSPEED_RPM);
 
-    desiredOutput[static_cast<uint8_t>(MotorId::LF)] = leftFront;
-    desiredOutput[static_cast<uint8_t>(MotorId::LB)] = leftBack;
-    desiredOutput[static_cast<uint8_t>(MotorId::RF)] = rightFront;
-    desiredOutput[static_cast<uint8_t>(MotorId::RB)] = rightBack;
+    leftVert = limitVal(leftVert, -MAX_WHEELSPEED_RPM, MAX_WHEELSPEED_RPM);
+    rightVert = limitVal(rightVert, -MAX_WHEELSPEED_RPM, MAX_WHEELSPEED_RPM);
+    leftHorz = limitVal(leftHorz, -MAX_WHEELSPEED_RPM, MAX_WHEELSPEED_RPM);
+    rightHorz = limitVal(rightHorz, -MAX_WHEELSPEED_RPM, MAX_WHEELSPEED_RPM);
+
+    // Implment Mecanum Wheel Logical Code Here
+
+    desiredOutput[static_cast<uint8_t>(MotorId::LF)] = leftVert + leftHorz + rightHorz;
+    desiredOutput[static_cast<uint8_t>(MotorId::LB)] = leftVert - leftHorz + rightHorz;
+    desiredOutput[static_cast<uint8_t>(MotorId::RF)] = leftVert - leftHorz - rightHorz;
+    desiredOutput[static_cast<uint8_t>(MotorId::RB)] = leftVert + leftHorz - rightHorz;
 }
 
-// STEP 5 (Tank Drive): refresh function
-void ChassisSubsystem::refresh()
+// STEP 5 Refresh function
+void ChassisSubsystem::refresh() // same btwn tank and mecanum
 {
     auto runPid = [](Pid &pid, Motor &motor, float desiredOutput) {
         pid.update(desiredOutput - motor.getShaftRPM());

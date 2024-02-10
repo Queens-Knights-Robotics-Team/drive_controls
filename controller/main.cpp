@@ -69,7 +69,6 @@ int main()
             PROFILE(drivers->profiler, drivers->djiMotorTxHandler.encodeAndSendCanData, ());
             PROFILE(drivers->profiler, drivers->terminalSerial.update, ());
         }
-
         modm::delay_us(10);
     }
     return 0;
@@ -90,7 +89,7 @@ static void initializeIo(Drivers *drivers)
     drivers->schedulerTerminalHandler.init();
     drivers->djiMotorTerminalSerialHandler.init();
 }
-
+// HI!
 static void updateIo(Drivers *drivers)
 {
     drivers->canRxHandler.pollCanData();

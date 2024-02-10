@@ -17,7 +17,7 @@
  * along with aruw-edu.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "chassis_omni_drive_command.hpp"
+#include "chassis_tank_drive_command.hpp"
 
 #include "tap/algorithms/math_user_utils.hpp"
 
@@ -29,31 +29,31 @@ using tap::algorithms::limitVal;
 
 namespace control::chassis
 {
-// STEP 1 (Tank Drive): Constructor
-ChassisOmniDriveCommand::ChassisOmniDriveCommand(
-    ChassisSubsystem &chassis,
+// Constructor
+ChassisTankDriveCommand::ChassisTankDriveCommand( // right of :: means method (constructor here), left is class that contains it
+    ChassisSubsystem &chassis, // ? about &
     ControlOperatorInterface &operatorInterface)
-    : chassis(chassis),
+    : chassis(chassis), // calling constructor on chassis parameter
       operatorInterface(operatorInterface)
 {
     addSubsystemRequirement(&chassis);
 }
 
-// STEP 2 (Tank Drive): execute function
-void ChassisOmniDriveCommand::execute()
+// Execute function
+void ChassisTankDriveCommand::execute()
 {
     auto scale = [](float raw) -> float {
         return limitVal(raw, -1.0f, 1.0f) * MAX_CHASSIS_SPEED_MPS;
     };
 
-    chassis.setVelocityOmniDrive(
-        scale(operatorInterface.getChassisOmniLeftFrontInput()),
-        scale(operatorInterface.getChassisOmniLeftBackInput()),
-        scale(operatorInterface.getChassisOmniRightFrontInput()),
-        scale(operatorInterface.getChassisOmniRightBackInput())
-    );
+    chassis.setVelocity(
+        scale(operatorInterface.getChassisLeftVerticalInput()),
+        scale(operatorInterface.getChassisRightVerticalInput()),
+        scale(operatorInterface.getChassisLeftHorizontalInput()), // added this for left horizontal joystick
+        scale(operatorInterface.getChassisRightHorizontalInput()) // added this for right horizontal joystick
+        );
 }
 
 // STEP 3 (Tank Drive): end function
-void ChassisOmniDriveCommand::end(bool) { chassis.setVelocityOmniDrive(.0f, .0f, .0f, .0f); }
+void ChassisTankDriveCommand::end(bool) { chassis.setVelocity(0, 0, 0, 0); }
 };  // namespace control::chassis
