@@ -33,7 +33,12 @@ ControlOperatorInterface::ControlOperatorInterface(Remote &remote) : remote(remo
 // definitions
 float ControlOperatorInterface::getChassisOmniLeftFrontInput() {
     //float result = vertical + horizonttal + right horizontal
-    if (remote.keyPressed(Remote::Key::Q)){
+    if (remote.keyPressed(Remote::Key::D) && remote.keyPressed(Remote::Key::Q)){
+        float trans = limitVal(0.1f, -1.0f, 1.0f);
+        float rotate = limitVal(-0.1f, -1.0f, 1.0f);
+        return trans + rotate; 
+    }
+    else-if (remote.keyPressed(Remote::Key::Q)){
         return limitVal(-0.1f, -1.0f, 1.0f);
     }
     else if  (remote.keyPressed(Remote::Key::W)){
@@ -61,7 +66,12 @@ float ControlOperatorInterface::getChassisOmniLeftFrontInput() {
 
 float ControlOperatorInterface::getChassisOmniLeftBackInput() {
     //float result = vertical - horizontal + rightHorizontal;
-    if  (remote.keyPressed(Remote::Key::W)){
+    if (remote.keyPressed(Remote::Key::D) && remote.keyPressed(Remote::Key::Q)){
+        float trans = limitVal(-0.1f, -1.0f, 1.0f);
+        float rotate = limitVal(-0.1f, -1.0f, 1.0f);
+        return trans + rotate; 
+    }
+    else if  (remote.keyPressed(Remote::Key::W)){
         return limitVal(0.1f, -1.0f, 1.0f);
     }
     else if (remote.keyPressed(Remote::Key::A)){
@@ -86,7 +96,12 @@ float ControlOperatorInterface::getChassisOmniLeftBackInput() {
 
 float ControlOperatorInterface::getChassisOmniRightFrontInput() {
     //float result = vertical - horizontal - rightHorizontal;
-    if  (remote.keyPressed(Remote::Key::W)){
+    if (remote.keyPressed(Remote::Key::D) && remote.keyPressed(Remote::Key::Q)){
+        float trans = limitVal(-0.1f, -1.0f, 1.0f);
+        float rotate = limitVal(0.1f, -1.0f, 1.0f);
+        return trans + rotate; 
+    }
+    else if  (remote.keyPressed(Remote::Key::W)){
         return limitVal(0.1f, -1.0f, 1.0f);
     }
     else if (remote.keyPressed(Remote::Key::A)){
@@ -111,7 +126,12 @@ float ControlOperatorInterface::getChassisOmniRightFrontInput() {
 
 float ControlOperatorInterface::getChassisOmniRightBackInput() {
     //float result = vertical + horizontal - rightHorizontal;
-    if  (remote.keyPressed(Remote::Key::W)){
+    if (remote.keyPressed(Remote::Key::D) && remote.keyPressed(Remote::Key::Q)){
+        float trans = limitVal(0.1f, -1.0f, 1.0f);
+        float rotate = limitVal(0.1f, -1.0f, 1.0f);
+        return trans + rotate; 
+    }
+    else if  (remote.keyPressed(Remote::Key::W)){
         return limitVal(0.1f, -1.0f, 1.0f);
     }
     else if (remote.keyPressed(Remote::Key::A)){
