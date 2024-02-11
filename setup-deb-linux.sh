@@ -39,6 +39,11 @@ if [ $(dpkg-query -W -f='${Status}' doxygen 2>/dev/null | grep -c "ok installed"
     sudo apt-get --no-install-recommends install doxygen -y -qq >/dev/null
 else echo "[INFO] 'doxygen' is already installed"
 fi
+if [ $(dpkg-query -W -f='${Status}' scons 2>/dev/null | grep -c "ok installed") -ne 1 ]; then
+    echo "[IMPORTANT] installing 'scons'"
+    sudo apt-get install scons -y -qq >/dev/null
+else echo "[INFO] 'scons' is already installed"
+fi
 
 # install python tools
 if ! command -v python3 &> /dev/null; then
