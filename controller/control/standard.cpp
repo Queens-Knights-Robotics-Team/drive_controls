@@ -33,64 +33,48 @@ using tap::motor::MotorId;
 
 namespace control
 {
-Robot::Robot(Drivers &drivers) 
-    : drivers(drivers),
-      // STEP 3 (Tank Drive): construct ChassisSubsystem and ChassisTankDriveCommand
-    chassis( // calling chassis constructor
-        drivers,
-        chassis::ChassisConfig{
-            .leftFrontId = MotorId::MOTOR2,
-            .leftBackId = MotorId::MOTOR3,
-            .rightBackId = MotorId::MOTOR4,
-            .rightFrontId = MotorId::MOTOR1,
-            .canBus = CanBus::CAN_BUS1,
-            .wheelVelocityPidConfig = modm::Pid<float>::Parameter(10, 0, 0, 0, 16'000),
-        }),
-    chassisTankDrive(chassis, drivers.controlOperatorInterface) // calling chassis tankdrive constructor
-    
-// STEP 3 (Agitator Control): construct VelocityAgitatorSubsystem and MoveIntegralCommand
-// STEP 8 (Agitator Control): construct HoldRepeatCommandMapping and HoldCommandMapping
-{
-}
+    Robot::Robot(Drivers &drivers)
+        : drivers(drivers),
+          // Construct ChassisSubsystem and ChassisTankDriveCommand
+          chassis( // calling chassis constructor
+              drivers,
+              chassis::ChassisConfig{
+                  // Add Gimbal Motor to chassis configuration
+                  .gimbalId = MotorId::MOTOR6, // (added gimbal motor to chassis configuration)
+                  .leftFrontId = MotorId::MOTOR2,
+                  .leftBackId = MotorId::MOTOR3,
+                  .rightBackId = MotorId::MOTOR4,
+                  .rightFrontId = MotorId::MOTOR1,
+                  .canBus = CanBus::CAN_BUS1,
+                  .wheelVelocityPidConfig = modm::Pid<float>::Parameter(10, 0, 0, 0, 16'000),
+              }),
+          chassisTankDrive(chassis, drivers.controlOperatorInterface) // calling chassis tankdrive constructor
+    {
+    }
 
-void Robot::initSubsystemCommands()
-{
-    initializeSubsystems();
-    registerSoldierSubsystems();
-    setDefaultSoldierCommands();
-    startSoldierCommands();
-    registerSoldierIoMappings();
-}
+    void Robot::initSubsystemCommands()
+    {
+        initializeSubsystems();
+        registerSoldierSubsystems();
+        setDefaultSoldierCommands();
+    }
 
-void Robot::initializeSubsystems()
-{
-    // STEP 4 (Tank Drive): initialize declared ChassisSubsystem
-    chassis.initialize();
-    // STEP 4 (Agitator Control): initialize declared VelocityAgitatorSubsystem
-    // agitatorSubsystem.initialize();
-}
+    void Robot::initializeSubsystems()
+    {
+        // Initialize declared ChassisSubsystem
+        chassis.initialize();
+    }
 
-void Robot::registerSoldierSubsystems()
-{
-    // STEP 5 (Tank Drive): register declared ChassisSubsystem
-    drivers.commandScheduler.registerSubsystem(&chassis);
+    void Robot::registerSoldierSubsystems()
+    {
+        // Register declared ChassisSubsystem
+        drivers.commandScheduler.registerSubsystem(&chassis);
+    }
 
+    void Robot::setDefaultSoldierCommands()
+    {
+        // Set ChassisTanKDriveCommand as default command for ChassisSubsystem
+        chassis.setDefaultCommand(&chassisTankDrive);
+    }
 
-    // STEP 5 (Agitator Control): register declared VelocityAgitatorSubsystem
-}
-
-void Robot::setDefaultSoldierCommands()
-{
-    // STEP 6 (Tank Drive): set ChassisTanKDriveCommand as default command for ChassisSubsystem
-    chassis.setDefaultCommand(&chassisTankDrive);
-
-
-}
-
-void Robot::startSoldierCommands() {}
-
-void Robot::registerSoldierIoMappings()
-{
-    // STEP 9 (Agitator Control): register HoldRepeatCommandMapping and HoldCommandMapping
-}
-}  // namespace control
+} // namespace control

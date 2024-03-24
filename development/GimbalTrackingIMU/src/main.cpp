@@ -23,8 +23,11 @@
 #include <iostream>
 #include "drivers_singleton.hpp"
 
+// Motor Constructors
 static constexpr tap::motor::MotorId MOTOR_ID = tap::motor::MOTOR6;
 static constexpr tap::can::CanBus CAN_BUS = tap::can::CanBus::CAN_BUS1;
+
+
 static constexpr int DESIRED_RPM = 3000;
 
 tap::arch::PeriodicMilliTimer sendMotorTimeout(2);
@@ -46,23 +49,34 @@ int main()
 
     Board::initialize();
 
+    // Intialize Drivers
     drivers->can.initialize();
     drivers->mpu6500.init();
 
+    // Initalize the motor
     motor.initialize();
 
     while (1)
     {
+        // Read Data from driver
         drivers->mpu6500.read();
 
         if (sendMotorTimeout.execute())
         {
+            // Update IMU's logic
             drivers->mpu6500.periodicIMUUpdate();
+
+            // Calculate the amount of yaw required
             yaw = drivers->mpu6500.getGz();
             yaw = -yaw;
 
+            // Apply PID Controller to the place of interest
             pidController.runControllerDerivateError(yaw - motor.getShaftRPM(), 1);
+
+            // Send the PID adjusted desired output to the motor
             motor.setDesiredOutput(static_cast<int32_t>(pidController.getOutput()));
+
+            // Sens
             drivers->djiMotorTxHandler.processCanSendData();
         }
 

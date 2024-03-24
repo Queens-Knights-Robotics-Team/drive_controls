@@ -42,24 +42,13 @@ private:
     void initializeSubsystems();
     void registerSoldierSubsystems();
     void setDefaultSoldierCommands();
-    void startSoldierCommands();
-    void registerSoldierIoMappings();
 
     Drivers &drivers;
 
-    // STEP 1 (Tank Drive): declare ChassisSubystem
+    // qdeclare ChassisSubystem
     chassis::ChassisSubsystem chassis;
 
-    // STEP 2 (Tank Drive): declare ChassisTankDriveCommand
+    // declare ChassisTankDriveCommand
     chassis::ChassisTankDriveCommand chassisTankDrive;
-
-
-    // STEP 1 (Agitator Control): declare VelocityAgitatorSubsystem
-
-    // STEP 2 (Agitator Control): declare MoveIntegralCommand
-
-    // STEP 6 (Agitator Control): declare HoldRepeatCommandMapping (rightSwitchUp)
-
-    // STEP 7 (Agitator Control): declare HoldCommandMapping (leftMousePressed)
 };
 }  // namespace control

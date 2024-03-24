@@ -54,6 +54,6 @@ void ChassisTankDriveCommand::execute()
         );
 }
 
-// STEP 3 (Tank Drive): end function
+// End function
 void ChassisTankDriveCommand::end(bool) { chassis.setVelocity(0, 0, 0, 0); }
 };  // namespace control::chassis
