@@ -37,7 +37,7 @@ class ControlOperatorInterface
 public:
     ControlOperatorInterface(tap::communication::serial::Remote& remote);
 
-    std::tuple<double, double, double> pollInput(double& lastInvoked);
+    std::tuple<double, double, double> pollInput();
 
     float getChassisOmniLeftFrontInput();
     float getChassisOmniLeftBackInput();

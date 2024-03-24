@@ -29,32 +29,20 @@ using tap::communication::serial::Remote;
 namespace control
 {
 
-static constexpr double R = 0.07625;    // radius of mechanum wheels in metres
+// static constexpr double R = 0.07625;    // radius of mechanum wheels in metres
 static constexpr double Scale = 1.0;    // arbitrary scaling factor for testing
-
-/* what needs to happens once per program iteration
- *  - get remote/kbm input
- *  - update the deltatime in mu
- */
 
 ControlOperatorInterface::ControlOperatorInterface(Remote &remote) : remote(remote) {}
 
-std::tuple<double, double, double> ControlOperatorInterface::pollInput(double& lastInvoked) {
+std::tuple<double, double, double> ControlOperatorInterface::pollInput() {
     /* use doubles for enhanced precision when processing return values */
-    
-    /* handle timing per wheel function call */
-    double curr = 1.0 / static_cast<double>(tap::arch::clock::getTimeMilliseconds());
-    double deltaTime = 1.0;
-    lastInvoked = curr;
 
     /* setup input variables to be processed */
     double lh = static_cast<double>(std::clamp(remote.getChannel(Remote::Channel::LEFT_HORIZONTAL), -1.0f, 1.0f)) * Scale;
     double lv = static_cast<double>(std::clamp(remote.getChannel(Remote::Channel::LEFT_VERTICAL), -1.0f, 1.0f)) * Scale;
     double rh = static_cast<double>(std::clamp(remote.getChannel(Remote::Channel::RIGHT_HORIZONTAL), -1.0, 1.0f)) * Scale;
-    // double rh = 0.5 * scale;  /* use for testing beyblade (constant spinning) */
-    float theta = rh * deltaTime;
 
-    return std::make_tuple(lh * deltaTime, lv * deltaTime, theta);
+    return std::make_tuple(lh, lv, rh);
 }
 
 /* field-centric movement strategy
@@ -75,33 +63,25 @@ std::tuple<double, double, double> ControlOperatorInterface::pollInput(double& l
 */
 
 float ControlOperatorInterface::getChassisOmniLeftFrontInput() {
-    static double lastInvoked = 0.0;
-    auto [vx, vy, w] = pollInput(lastInvoked);
-    // return (1.0 / R) * (vx - vy - (0.4015 * w));
+    auto [vx, vy, w] = pollInput();
     double denom = std::max(std::abs(vy) + std::abs(vx) + std::abs(w), static_cast<double>(1.0));
     return (vy + vx + w) / denom;
 }
 
 float ControlOperatorInterface::getChassisOmniLeftBackInput() {
-    static double lastInvoked = 0.0;
-    auto [vx, vy, w] = pollInput(lastInvoked);
-    // return (1.0 / R) * (vx + vy - (0.4015 * w));
+    auto [vx, vy, w] = pollInput();
     double denom = std::max(std::abs(vy) + std::abs(vx) + std::abs(w), static_cast<double>(1.0));
     return (vy - vx + w) / denom;
 }
 
 float ControlOperatorInterface::getChassisOmniRightFrontInput() {
-    static double lastInvoked = 0.0;
-    auto [vx, vy, w] = pollInput(lastInvoked);
-    // return (1.0 / R) * (vx + vy + (0.4015 * w));
+    auto [vx, vy, w] = pollInput();
     double denom = std::max(std::abs(vy) + std::abs(vx) + std::abs(w), static_cast<double>(1.0));
     return (vy - vx - w) / denom;
 }
 
 float ControlOperatorInterface::getChassisOmniRightBackInput() {
-    static double lastInvoked = 0.0;
-    auto [vx, vy, w] = pollInput(lastInvoked);
-    // return (1.0 / R) * (vx - vy + (0.4015 * w));
+    auto [vx, vy, w] = pollInput();
     double denom = std::max(std::abs(vy) + std::abs(vx) + std::abs(w), static_cast<double>(1.0));
     return (vy + vx - w) / denom;
 }
