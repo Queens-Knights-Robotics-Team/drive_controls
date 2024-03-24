@@ -86,9 +86,10 @@ namespace control::chassis
         desiredOutput[static_cast<uint8_t>(MotorId::RB)] = leftVert + leftHorz - rightHorz;
     }
 
-    //setGimbal function (need to figure out the problem with motor reference!)
-    void ChassisSubsystem::setGimbal()
+    //setGimbal function
+    void ChassisSubsystem::setGimbal() // add parameters as needed
     {
+        // Read Data from driver
          drivers->mpu6500.read();
 
         if (sendMotorTimeout.execute())
@@ -101,13 +102,14 @@ namespace control::chassis
             yaw = -yaw;
 
             // Apply PID Controller to the place of interest
-            pidController.runControllerDerivateError(yaw - MotorId::GIMBAL.getShaftRPM(), 1); // error here, has to do with motor type!
+            pidController.runControllerDerivateError(yaw - MotorId::GIMBAL.getShaftRPM(), 1); // error
 
             // Send the PID adjusted desired output to the motor
-            MotorId::GIMBAL.setDesiredOutput(static_cast<int32_t>(pidController.getOutput()));
+            // MotorId::GIMBAL.setDesiredOutput(static_cast<int32_t>(pidController.getOutput())); // should be replaced by next line & line in runPid
+            desiredOutput[static_cast<uint8_t>(MotorId::GIMBAL)] = static_cast<int32_t>(pidController.getOutput());
 
             // Sens
-            drivers->djiMotorTxHandler.processCanSendData();
+            drivers->djiMotorTxHandler.processCanSendData(); // error
         }
 
         drivers->canRxHandler.pollCanData();

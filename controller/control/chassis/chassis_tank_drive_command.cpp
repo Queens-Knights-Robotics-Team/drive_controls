@@ -52,8 +52,10 @@ void ChassisTankDriveCommand::execute()
         scale(operatorInterface.getChassisLeftHorizontalInput()), // added this for left horizontal joystick
         scale(operatorInterface.getChassisRightHorizontalInput()) // added this for right horizontal joystick
         );
+
+    chassis.setGimbal(); // add parameters as needed
 }
 
 // End function
-void ChassisTankDriveCommand::end(bool) { chassis.setVelocity(0, 0, 0, 0); }
+void ChassisTankDriveCommand::end(bool) { chassis.setVelocity(0, 0, 0, 0); } // add gimbal here too eventually?
 };  // namespace control::chassis
