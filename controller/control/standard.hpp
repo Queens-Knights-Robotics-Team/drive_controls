@@ -23,9 +23,8 @@
 #include "tap/control/hold_repeat_command_mapping.hpp"
 #include "tap/control/setpoint/commands/move_integral_command.hpp"
 
-#include "control/agitator/velocity_agitator_subsystem.hpp"
 #include "control/chassis/chassis_subsystem.hpp"
-#include "control/chassis/chassis_tank_drive_command.hpp"
+#include "control/chassis/chassis_omni_drive_command.hpp"
 
 class Drivers;
 
@@ -42,13 +41,15 @@ private:
     void initializeSubsystems();
     void registerSoldierSubsystems();
     void setDefaultSoldierCommands();
+    void startSoldierCommands();
+    void registerSoldierIoMappings();
 
     Drivers &drivers;
 
-    // qdeclare ChassisSubystem
+    // STEP 1 (Tank Drive): declare ChassisSubystem
     chassis::ChassisSubsystem chassis;
 
-    // declare ChassisTankDriveCommand
-    chassis::ChassisTankDriveCommand chassisTankDrive;
+    // STEP 2 (Tank Drive): declare ChassisTankDriveCommand
+    chassis::ChassisOmniDriveCommand chassisOmniDrive;
 };
 }  // namespace control

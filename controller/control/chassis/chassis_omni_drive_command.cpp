@@ -17,7 +17,7 @@
  * along with aruw-edu.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "chassis_tank_drive_command.hpp"
+#include "chassis_omni_drive_command.hpp"
 
 #include "tap/algorithms/math_user_utils.hpp"
 
@@ -29,33 +29,31 @@ using tap::algorithms::limitVal;
 
 namespace control::chassis
 {
-// Constructor
-ChassisTankDriveCommand::ChassisTankDriveCommand( // right of :: means method (constructor here), left is class that contains it
-    ChassisSubsystem &chassis, // ? about &
+// STEP 1 (Tank Drive): Constructor
+ChassisOmniDriveCommand::ChassisOmniDriveCommand(
+    ChassisSubsystem &chassis,
     ControlOperatorInterface &operatorInterface)
-    : chassis(chassis), // calling constructor on chassis parameter
+    : chassis(chassis),
       operatorInterface(operatorInterface)
 {
     addSubsystemRequirement(&chassis);
 }
 
-// Execute function
-void ChassisTankDriveCommand::execute()
+// STEP 2 (Tank Drive): execute function
+void ChassisOmniDriveCommand::execute()
 {
     auto scale = [](float raw) -> float {
         return limitVal(raw, -1.0f, 1.0f) * MAX_CHASSIS_SPEED_MPS;
     };
 
-    chassis.setVelocity(
-        scale(operatorInterface.getChassisLeftVerticalInput()),
-        scale(operatorInterface.getChassisRightVerticalInput()),
-        scale(operatorInterface.getChassisLeftHorizontalInput()), // added this for left horizontal joystick
-        scale(operatorInterface.getChassisRightHorizontalInput()) // added this for right horizontal joystick
-        );
-
-    chassis.setGimbal(); // add parameters as needed
+    chassis.setVelocityOmniDrive(
+        scale(operatorInterface.getChassisOmniLeftFrontInput()),
+        scale(operatorInterface.getChassisOmniLeftBackInput()),
+        scale(operatorInterface.getChassisOmniRightFrontInput()),
+        scale(operatorInterface.getChassisOmniRightBackInput())
+    );
 }
 
-// End function
-void ChassisTankDriveCommand::end(bool) { chassis.setVelocity(0, 0, 0, 0); } // add gimbal here too eventually?
+// STEP 3 (Tank Drive): end function
+void ChassisOmniDriveCommand::end(bool) { chassis.setVelocityOmniDrive(.0f, .0f, .0f, .0f); }
 };  // namespace control::chassis

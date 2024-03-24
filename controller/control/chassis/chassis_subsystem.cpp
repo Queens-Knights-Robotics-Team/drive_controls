@@ -23,111 +23,70 @@
 
 #include "drivers.hpp"
 
-#include "tap/algorithms/smooth_pid.hpp" // added for gimbal, should be included from main.cpp but gives error
-
 using tap::algorithms::limitVal;
-
-// stuff from GimbalTrackingIMU main.cpp 
-static constexpr int DESIRED_RPM = 3000;
-tap::arch::PeriodicMilliTimer sendMotorTimeout(2);
-tap::algorithms::SmoothPid pidController(20, 0, 0, 0, 8000, 1, 0, 1, 0);
-tap::arch::PeriodicMilliTimer updateImuTimeout(2);
 
 namespace control::chassis
 {
-    float yaw; // added for Gimbal
-    // Create constructor
-    ChassisSubsystem::ChassisSubsystem(Drivers &drivers, const ChassisConfig &config) // same btwn tank and mecanum
-        : tap::control::Subsystem(&drivers),
-          desiredOutput{},
-          pidControllers{},
-          motors{
-              // Add Gimbal Motor Intilaization (done)
-              Motor(&drivers, config.gimbalId, config.canBus, false, "GIMBAL"), //added gimbal motor init, see DoNotUse_getDrivers()?
-              Motor(&drivers, config.leftFrontId, config.canBus, false, "LF"),
-              Motor(&drivers, config.leftBackId, config.canBus, false, "LB"),
-              Motor(&drivers, config.rightBackId, config.canBus, true, "RB"),
-              Motor(&drivers, config.rightFrontId, config.canBus, true, "RF"),
-          }
+// STEP 1 (Tank Drive): create constructor
+ChassisSubsystem::ChassisSubsystem(Drivers &drivers, const ChassisConfig &config)
+    : tap::control::Subsystem(&drivers),
+      desiredOutput{},
+      pidControllers{},
+      motors{
+          Motor(&drivers, config.leftFrontId, config.canBus, false, "LF"),
+          Motor(&drivers, config.leftBackId, config.canBus, false, "LB"),
+          Motor(&drivers, config.rightFrontId, config.canBus, true, "RF"),
+          Motor(&drivers, config.rightBackId, config.canBus, true, "RB")
+      }
+{
+    for (auto &controller : pidControllers)
     {
-        for (auto &controller : pidControllers)
-        {
-            controller.setParameter(config.wheelVelocityPidConfig);
-        }
+        controller.setParameter(config.wheelVelocityPidConfig);
     }
+}
 
-    // Initialize function
-    void ChassisSubsystem::initialize() // same btwn tank and mecanum
+// STEP 2 (Tank Drive): initialize function
+void ChassisSubsystem::initialize()
+{
+    for (auto &motor : motors)
     {
-        for (auto &motor : motors)
-        {
-            motor.initialize();
-        }
+        motor.initialize();
     }
+}
 
-    // setVelocity function
-    void ChassisSubsystem::setVelocity(float leftVert, float rightVert, float leftHorz, float rightHorz) // same btwn tank and mecanum
+// STEP 4 (Tank Drive): setVelocityOmniDrive function
+void ChassisSubsystem::setVelocityOmniDrive(float leftFront,
+                                            float leftBack,
+                                            float rightFront,
+                                            float rightBack)
+{
+    leftFront  = mpsToRpm(leftFront);
+    leftBack   = mpsToRpm(leftBack);
+    rightFront = mpsToRpm(rightFront);
+    rightBack  = mpsToRpm(rightBack);
+
+    leftFront  = limitVal(leftFront, -MAX_WHEELSPEED_RPM, MAX_WHEELSPEED_RPM);
+    leftBack   = limitVal(leftBack, -MAX_WHEELSPEED_RPM, MAX_WHEELSPEED_RPM);
+    rightFront = limitVal(rightFront, -MAX_WHEELSPEED_RPM, MAX_WHEELSPEED_RPM);
+    rightBack  = limitVal(rightBack, -MAX_WHEELSPEED_RPM, MAX_WHEELSPEED_RPM);
+
+    desiredOutput[static_cast<uint8_t>(MotorId::LF)] = leftFront;
+    desiredOutput[static_cast<uint8_t>(MotorId::LB)] = leftBack;
+    desiredOutput[static_cast<uint8_t>(MotorId::RF)] = rightFront;
+    desiredOutput[static_cast<uint8_t>(MotorId::RB)] = rightBack;
+}
+
+// STEP 5 (Tank Drive): refresh function
+void ChassisSubsystem::refresh()
+{
+    auto runPid = [](Pid &pid, Motor &motor, float desiredOutput) {
+        pid.update(desiredOutput - motor.getShaftRPM());
+        motor.setDesiredOutput(pid.getValue());
+    };
+
+    for (size_t ii = 0; ii < motors.size(); ii++)
     {
-        leftVert = mpsToRpm(leftVert);
-        rightVert = mpsToRpm(rightVert);
-        leftHorz = mpsToRpm(leftHorz);
-        rightHorz = mpsToRpm(rightHorz);
-
-        leftVert = limitVal(leftVert, -MAX_WHEELSPEED_RPM, MAX_WHEELSPEED_RPM);
-        rightVert = limitVal(rightVert, -MAX_WHEELSPEED_RPM, MAX_WHEELSPEED_RPM);
-        leftHorz = limitVal(leftHorz, -MAX_WHEELSPEED_RPM, MAX_WHEELSPEED_RPM);
-        rightHorz = limitVal(rightHorz, -MAX_WHEELSPEED_RPM, MAX_WHEELSPEED_RPM);
-
-        // Implment Mecanum Wheel Logical Code Here
-
-        desiredOutput[static_cast<uint8_t>(MotorId::LF)] = leftVert + leftHorz + rightHorz;
-        desiredOutput[static_cast<uint8_t>(MotorId::LB)] = leftVert - leftHorz + rightHorz;
-        desiredOutput[static_cast<uint8_t>(MotorId::RF)] = leftVert - leftHorz - rightHorz;
-        desiredOutput[static_cast<uint8_t>(MotorId::RB)] = leftVert + leftHorz - rightHorz;
+        runPid(pidControllers[ii], motors[ii], desiredOutput[ii]);
     }
-
-    //setGimbal function
-    void ChassisSubsystem::setGimbal() // add parameters as needed
-    {
-        // Read Data from driver
-         drivers->mpu6500.read();
-
-        if (sendMotorTimeout.execute())
-        {
-            // Update IMU's logic
-            drivers->mpu6500.periodicIMUUpdate();
-
-            // Calculate the amount of yaw required
-            yaw = drivers->mpu6500.getGz();
-            yaw = -yaw;
-
-            // Apply PID Controller to the place of interest
-            pidController.runControllerDerivateError(yaw - MotorId::GIMBAL.getShaftRPM(), 1); // error
-
-            // Send the PID adjusted desired output to the motor
-            // MotorId::GIMBAL.setDesiredOutput(static_cast<int32_t>(pidController.getOutput())); // should be replaced by next line & line in runPid
-            desiredOutput[static_cast<uint8_t>(MotorId::GIMBAL)] = static_cast<int32_t>(pidController.getOutput());
-
-            // Sens
-            drivers->djiMotorTxHandler.processCanSendData(); // error
-        }
-
-        drivers->canRxHandler.pollCanData();
-        modm::delay_us(10);
-    }
-
-    // STEP 5 Refresh function
-    void ChassisSubsystem::refresh() // same btwn tank and mecanum
-    {
-        auto runPid = [](Pid &pid, Motor &motor, float desiredOutput)
-        {
-            pid.update(desiredOutput - motor.getShaftRPM());
-            motor.setDesiredOutput(pid.getValue());
-        };
-
-        for (size_t ii = 0; ii < motors.size(); ii++)
-        {
-            runPid(pidControllers[ii], motors[ii], desiredOutput[ii]);
-        }
-    }
-} // namespace control::chassis
+}
+}  // namespace control::chassis

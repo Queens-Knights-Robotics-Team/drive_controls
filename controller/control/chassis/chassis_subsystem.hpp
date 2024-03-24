@@ -37,96 +37,90 @@ class Drivers;
 
 namespace control::chassis
 {
-    struct ChassisConfig
+struct ChassisConfig
+{
+    tap::motor::MotorId leftFrontId;
+    tap::motor::MotorId leftBackId;
+    tap::motor::MotorId rightBackId;
+    tap::motor::MotorId rightFrontId;
+    tap::can::CanBus canBus;
+    modm::Pid<float>::Parameter wheelVelocityPidConfig;
+};
+
+///
+/// @brief This subsystem encapsulates four motors that control the chassis.
+///
+class ChassisSubsystem : public tap::control::Subsystem
+{
+public:
+    /// @brief Motor ID to index into the velocityPid and motors object.
+    enum class MotorId : uint8_t
     {
-        // Add Gimbal Motor Variable (done)
-        tap::motor::MotorId gimbalId; // new gimbalId variable
-        tap::motor::MotorId leftFrontId;
-        tap::motor::MotorId leftBackId;
-        tap::motor::MotorId rightBackId;
-        tap::motor::MotorId rightFrontId;
-        tap::can::CanBus canBus;
-        modm::Pid<float>::Parameter wheelVelocityPidConfig;
+        LF = 0,  ///< Left front
+        LB,      ///< Left back
+        RF,      ///< Right front
+        RB,      ///< Right back
+        NUM_MOTORS,
     };
 
-    ///
-    /// @brief This subsystem encapsulates four motors that control the chassis.
-    ///
-    class ChassisSubsystem : public tap::control::Subsystem
-    {
-    public:
-        /// @brief Motor ID to index into the velocityPid and motors object.
-        enum class MotorId : uint8_t
-        {
-            GIMBAL, // added gimbal ID name
-            LF, ///< Left front
-            LB, ///< Left back
-            RB, ///< Right back
-            RF, ///< Right front
-            NUM_MOTORS,
-        };
-
-        using Pid = modm::Pid<float>;
+    using Pid = modm::Pid<float>;
 
 #if defined(PLATFORM_HOSTED) && defined(ENV_UNIT_TESTS)
-        using Motor = testing::NiceMock<tap::mock::DjiMotorMock>;
+    using Motor = testing::NiceMock<tap::mock::DjiMotorMock>;
 #else
-        using Motor = tap::motor::DjiMotor;
+    using Motor = tap::motor::DjiMotor;
 #endif
 
-        static constexpr float MAX_WHEELSPEED_RPM = 7000;
+    static constexpr float MAX_WHEELSPEED_RPM = 7000;
 
-        ChassisSubsystem(Drivers &drivers, const ChassisConfig &config);
+    ChassisSubsystem(Drivers& drivers, const ChassisConfig& config);
 
-        ///
-        /// @brief Initializes the drive motors.
-        ///
-        void initialize() override;
+    ///
+    /// @brief Initializes the drive motors.
+    ///
+    void initialize() override;
 
-        ///
-        /// @brief Control the chassis using tank drive. Sets the wheel velocity of the four drive
-        /// motors based on the input left/right desired velocity.
-        ///
-        /// @param leftVert
-        ///
-        /// @param rightVert
-        ///
-        /// @param leftHorz
-        ///
-        /// @param rightHorz
-        ///
+    ///
+    /// @brief Control the chassis using omni drive. Sets the wheel velocity of the four drive
+    /// motors individually based on on the input left/right desired velocity.
+    ///
+    /// @param leftFront Desired speed in m/s of the left-front wheel of the chassis. Positive speed is
+    /// forward, negative is backwards.
+    /// @param leftBack Desired speed in m/s of the left-back wheel of the chassis. Positive speed is
+    /// forward, negative is backwards.
+    /// @param rightFront Desired chassis speed in m/s of the right-front of the chassis. Positive speed is
+    /// forward, negative is backwards.
+    /// @param rightBack Desired speed in m/s of the right-back wheel of the chassis. Positive speed is
+    /// forward, negative is backwards.
+    ///
+    void setVelocityOmniDrive(float leftFront, float leftBack, float rightFront, float rightBack);
+    
+    ///
+    /// @brief Runs velocity PID controllers for the drive motors.
+    ///
+    void refresh() override;
 
-        mockable void setVelocity(float leftVert, float rightVert, float leftHorz, float rightHorz);
-        
-        // Declare Gimbal logic method
-        mockable void setGimbal(); // added method declaration, does it have to be mockable?
+    const char* getName() override { return "Chassis"; }
 
-        ///
-        /// @brief Runs velocity PID controllers for the drive motors.
-        ///
-        void refresh() override;
+private:
+    inline float mpsToRpm(float mps)
+    {
+        static constexpr float GEAR_RATIO = 19.0f;
+        static constexpr float WHEEL_DIAMETER_M = 0.076f;
+        static constexpr float WHEEL_CIRCUMFERANCE_M = M_PI * WHEEL_DIAMETER_M;
+        static constexpr float SEC_PER_M = 60.0f;
 
-        const char *getName() override { return "Chassis"; }
+        return (mps / WHEEL_CIRCUMFERANCE_M) * SEC_PER_M * GEAR_RATIO;
+    }
 
-    private:
-        inline float mpsToRpm(float mps)
-        {
-            static constexpr float GEAR_RATIO = 19.0f;
-            static constexpr float WHEEL_DIAMETER_M = 0.076f;
-            static constexpr float WHEEL_CIRCUMFERANCE_M = M_PI * WHEEL_DIAMETER_M;
-            static constexpr float SEC_PER_M = 60.0f;
+    /// Desired wheel output for each motor
+    std::array<float, static_cast<uint8_t>(MotorId::NUM_MOTORS)> desiredOutput;
 
-            return (mps / WHEEL_CIRCUMFERANCE_M) * SEC_PER_M * GEAR_RATIO;
-        }
+    /// PID controllers. Input desired wheel velocity, output desired motor current.
+    std::array<Pid, static_cast<uint8_t>(MotorId::NUM_MOTORS)> pidControllers;
 
-        /// Desired wheel output for each motor
-        std::array<float, static_cast<uint8_t>(MotorId::NUM_MOTORS)> desiredOutput;
-
-        /// PID controllers. Input desired wheel velocity, output desired motor current.
-        std::array<Pid, static_cast<uint8_t>(MotorId::NUM_MOTORS)> pidControllers;
-
-    protected:
-        /// Motors.
-        std::array<Motor, static_cast<uint8_t>(MotorId::NUM_MOTORS)> motors;
-    }; // class ChassisSubsystem
-} // namespace control::chassis
+protected:
+    /// Motors.
+    std::array<Motor, static_cast<uint8_t>(MotorId::NUM_MOTORS)> motors;
+};  // class ChassisSubsystem
+}  // namespace control::chassis

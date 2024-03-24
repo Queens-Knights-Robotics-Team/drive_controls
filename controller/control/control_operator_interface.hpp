@@ -21,6 +21,10 @@
 
 #include "tap/util_macros.hpp"
 
+
+#include <tuple>
+#include <algorithm>
+
 namespace tap::communication::serial
 {
 class Remote;
@@ -31,19 +35,15 @@ namespace control
 class ControlOperatorInterface
 {
 public:
-    ControlOperatorInterface(tap::communication::serial::Remote &remote);
+    ControlOperatorInterface(tap::communication::serial::Remote& remote);
 
-    // Add getChassisLeftVerticalInput, getChassisLeftHorizontalInput, getChassisRightVerticalInput, and getChassisRightHorizontalInput functions
-    mockable float getChassisLeftVerticalInput();
+    std::tuple<double, double, double> pollInput(double& lastInvoked);
 
-    mockable float getChassisRightVerticalInput();
-
-    mockable float getChassisLeftHorizontalInput();
-
-    mockable float getChassisRightHorizontalInput();
-
-
+    float getChassisOmniLeftFrontInput();
+    float getChassisOmniLeftBackInput();
+    float getChassisOmniRightFrontInput();
+    float getChassisOmniRightBackInput();
 private:
-    tap::communication::serial::Remote &remote;
+    tap::communication::serial::Remote& remote;
 };
 }  // namespace control

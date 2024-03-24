@@ -16,9 +16,6 @@
  * You should have received a copy of the GNU General Public License
  * along with aruw-edu.  If not, see <https://www.gnu.org/licenses/>.
  */
-// include necessary for gimbal control (done)
-#include "tap/algorithms/smooth_pid.hpp"
-#include <iostream>
 
 #include "tap/architecture/clock.hpp"
 #include "tap/architecture/periodic_timer.hpp"
@@ -57,9 +54,7 @@ int main()
     Drivers *drivers = DoNotUse_getDrivers();
 
     Board::initialize();
-
     initializeIo(drivers);
-
     robot.initSubsystemCommands();
 
     while (1)
@@ -74,6 +69,7 @@ int main()
             PROFILE(drivers->profiler, drivers->djiMotorTxHandler.encodeAndSendCanData, ());
             PROFILE(drivers->profiler, drivers->terminalSerial.update, ());
         }
+
         modm::delay_us(10);
     }
     return 0;
@@ -97,10 +93,8 @@ static void initializeIo(Drivers *drivers)
 
 static void updateIo(Drivers *drivers)
 {
-    // drivers->canRxHandler.pollCanData();
+    drivers->canRxHandler.pollCanData();
     drivers->refSerial.updateSerial();
     drivers->remote.read();
     drivers->mpu6500.read();
-    // Moved poll Can Data to the back
-    drivers->canRxHandler.pollCanData();
 }
