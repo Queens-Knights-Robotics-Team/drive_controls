@@ -19,15 +19,15 @@
 
 #pragma once
 
-#include "tap/util_macros.hpp"
-
+// #include "tap/communication/serial/remote.hpp"
+// #include "tap/communication/sensors/imu/mpu6500/mpu6500.hpp"
 
 #include <tuple>
-#include <algorithm>
 
-namespace tap::communication::serial
+namespace tap::communication
 {
-class Remote;
+namespace serial { class Remote; }
+namespace sensors::imu::mpu6500 { class Mpu6500; }
 }
 
 namespace control
@@ -35,7 +35,8 @@ namespace control
 class ControlOperatorInterface
 {
 public:
-    ControlOperatorInterface(tap::communication::serial::Remote& remote);
+    ControlOperatorInterface(tap::communication::serial::Remote& remote,
+                             tap::communication::sensors::imu::mpu6500::Mpu6500& imu);
 
     std::tuple<double, double, double> pollInput();
 
@@ -45,5 +46,6 @@ public:
     float getChassisOmniRightBackInput();
 private:
     tap::communication::serial::Remote& remote;
+    tap::communication::sensors::imu::mpu6500::Mpu6500& imu;
 };
 }  // namespace control

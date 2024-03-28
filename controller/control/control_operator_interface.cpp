@@ -21,46 +21,33 @@
 
 #include "tap/algorithms/math_user_utils.hpp"
 #include "tap/communication/serial/remote.hpp"
+#include "tap/communication/sensors/imu/mpu6500/mpu6500.hpp"
 #include "tap/architecture/clock.hpp"
 
 using tap::algorithms::limitVal;
 using tap::communication::serial::Remote;
+using tap::communication::sensors::imu::mpu6500::Mpu6500;
 
 namespace control
 {
 
-// static constexpr double R = 0.07625;    // radius of mechanum wheels in metres
-static constexpr double Scale = 1.0;    // arbitrary scaling factor for testing
+#define PI 3.1415927f
 
-ControlOperatorInterface::ControlOperatorInterface(Remote &remote) : remote(remote) {}
+ControlOperatorInterface::ControlOperatorInterface(Remote &remote, Mpu6500& imu)
+        : remote(remote), imu(imu) {}
 
 std::tuple<double, double, double> ControlOperatorInterface::pollInput() {
     /* use doubles for enhanced precision when processing return values */
+    double x    = static_cast<double>(std::clamp(remote.getChannel(Remote::Channel::LEFT_HORIZONTAL),  -1.0f, 1.0f));
+    double y    = static_cast<double>(std::clamp(remote.getChannel(Remote::Channel::LEFT_VERTICAL),    -1.0f, 1.0f));
+    double yaw  = static_cast<double>(modm::toRadian(imu.getYaw()));
+    double rotX = x * std::cos(-yaw) - y * std::sin(-yaw);
+    double rotY = x * std::sin(-yaw) + y * std::cos(-yaw);
 
-    /* setup input variables to be processed */
-    double lh = static_cast<double>(std::clamp(remote.getChannel(Remote::Channel::LEFT_HORIZONTAL), -1.0f, 1.0f)) * Scale;
-    double lv = static_cast<double>(std::clamp(remote.getChannel(Remote::Channel::LEFT_VERTICAL), -1.0f, 1.0f)) * Scale;
-    double rh = static_cast<double>(std::clamp(remote.getChannel(Remote::Channel::RIGHT_HORIZONTAL), -1.0, 1.0f)) * Scale;
-
-    return std::make_tuple(lh, lv, rh);
+    double rx   = static_cast<double>(std::clamp(remote.getChannel(Remote::Channel::RIGHT_HORIZONTAL), -1.0f, 1.0f));
+    
+    return std::make_tuple(rotX, rotY, rx);
 }
-
-/* field-centric movement strategy
- * 
- * - keep track of the chassis' rotation using IMU
- * double botHeading = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
- * 
- * - rotate the movement direction counter to the chassis' rotation
- * double rotX = x * Math.cos(-botHeading) - y * Math.sin(-botHeading);
- * double rotY = x * Math.sin(-botHeading) + y * Math.cos(-botHeading);
- * 
- * - how to combine variables for proper movement
- * double denominator = Math.max(Math.abs(rotY) + Math.abs(rotX) + Math.abs(rx), 1);
- * double frontLeftPower = (rotY + rotX + rx) / denominator;
- * double backLeftPower = (rotY - rotX + rx) / denominator;
- * double frontRightPower = (rotY - rotX - rx) / denominator;
- * double backRightPower = (rotY + rotX - rx) / denominator;
-*/
 
 float ControlOperatorInterface::getChassisOmniLeftFrontInput() {
     auto [vx, vy, w] = pollInput();
